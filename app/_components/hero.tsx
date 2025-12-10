@@ -1,12 +1,124 @@
-
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
+import { Pencil, Send, Globe, MapPin, Sparkles, Mountain, LucideIcon, ChevronDown } from 'lucide-react'
+import { HeroVideoDialog } from '@/components/ui/hero-video-dialog'
 
 const Hero = () => {
+  const [inputValue, setInputValue] = useState('')
+
+  const quickActions = [
+    {
+      label: 'Create New Trip',
+      icon: Globe,
+      iconColor: 'text-blue-600',
+      bgColor: 'bg-blue-100',
+      hoverBgColor: 'group-hover:bg-blue-200',
+      badge: { type: 'text', content: '+', className: 'absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold' }
+    },
+    {
+      label: 'Inspire me where to Go',
+      icon: MapPin,
+      iconColor: 'text-green-600',
+      bgColor: 'bg-green-100',
+      hoverBgColor: 'group-hover:bg-green-200',
+      badge: { type: 'icon', icon: Sparkles, className: 'w-3 h-3 text-green-600 absolute -top-0.5 -right-0.5' }
+    },
+    {
+      label: 'Discover Hidden Gems',
+      icon: Sparkles,
+      iconColor: 'text-pink-600',
+      bgColor: 'bg-pink-100',
+      hoverBgColor: 'group-hover:bg-pink-200',
+    },
+    {
+      label: 'Adventure Destinations',
+      icon: Mountain,
+      iconColor: 'text-green-600',
+      bgColor: 'bg-green-100',
+      hoverBgColor: 'group-hover:bg-green-200',
+    },
+  ]
+
   return (
-    <div className='flex flex-col items-center justify-center h-screen'>
-        <h1 className='text-4xl font-bold'>SkyTrip</h1>
-        <p className='text-2xl'>AI powered trip planner</p>
+    <div className='flex flex-col items-center justify-center min-h-screen px-4 py-8'>
+      <div className='max-w-4xl w-full space-y-8'>
+
+        <div className='text-center space-y-4'>
+          <h1 className='text-5xl md:text-6xl font-bold text-gray-800 py-12'>
+            Hey, I'm your personal{' '}
+            <span className='text-primary'>trip planner</span>
+          </h1>
+          <p className='text-lg md:text-xl text-gray-500 max-w-2xl mx-auto'>
+            Tell me what you want, and I'll handle the rest: flights, hotels, itineraries — all in seconds.
+          </p>
+        </div>
+
+        <div className='relative w-full max-w-3xl mx-auto'>
+          <div className='relative flex items-center bg-white border-2 border-gray-200 rounded-2xl px-4 py-4 shadow-sm hover:border-gray-300 transition-colors'>
+            <Pencil className='w-5 h-5 text-gray-400 mr-3' />
+            <input
+              type='text'
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder='Create a trip for Paris from New York'
+              className='flex-1 outline-none text-gray-700 placeholder-gray-400 text-lg'
+            />
+            <button
+              className='ml-3 w-12 h-12 rounded-full bg-primary hover:bg-[#FF5A3A] transition-colors flex items-center justify-center text-white shadow-md'
+              aria-label='Submit'
+            >
+              <Send className='w-5 h-5' />
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Action Buttons */}
+        <div className='flex flex-wrap justify-center gap-4 md:gap-6 mt-8'>
+          {quickActions.map((action, index) => {
+            const IconComponent = action.icon
+            const BadgeIcon = action.badge?.icon
+            
+            return (
+              <button
+                key={index}
+                className='flex flex-col items-center cursor-pointer gap-2 p-4 rounded-xl hover:bg-gray-50 transition-colors group'
+              >
+                <div className={`w-12 h-12 rounded-full ${action.bgColor} flex items-center  justify-center ${action.hoverBgColor} transition-colors ${action.badge ? 'relative' : ''}`}>
+                  <IconComponent className={`w-6 h-6 ${action.iconColor}`} />
+                  {action.badge && (
+                    <>
+                      {action.badge.type === 'text' && (
+                        <span className={action.badge.className}>{action.badge.content}</span>
+                      )}
+                      {action.badge.type === 'icon' && BadgeIcon && (
+                        <BadgeIcon className={action.badge.className} />
+                      )}
+                    </>
+                  )}
+                </div>
+                <span className='text-sm text-gray-700 font-medium'>{action.label}</span>
+              </button>
+            )
+          })}
+        </div>
+
+        <div className='text-center mt-8 pt-4'>
+          <p className='text-gray-700 text-base md:text-lg'>
+            Not Sure where to start?{' '}
+            <span className='font-bold'>See how it works</span>
+            <ChevronDown className='inline-block w-4 h-4 ml-1 text-gray-700' />
+          </p>
+        </div>
+
+        {/* Hero Video Dialog */}
+        <HeroVideoDialog
+          className="block dark:hidden mt-8"
+          animationStyle="from-center"
+          videoSrc="https://www.example.com/dummy-video"
+          thumbnailSrc="https://media.licdn.com/dms/image/v2/D5612AQE-YXa0pSRzvA/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1735040179159?e=2147483647&v=beta&t=ADbWWhJWdO-nyIyW4K9icC58S3ouzpKATgHXfL9YpbM"
+          thumbnailAlt="Dummy Video Thumbnail"
+        />
+      </div>
     </div>
   )
 }
