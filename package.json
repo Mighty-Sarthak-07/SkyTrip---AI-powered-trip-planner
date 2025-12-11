@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.36.2",
     "@radix-ui/react-slot": "^1.2.4",
+    "@tabler/icons-react": "^3.35.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cobe": "^0.6.5",

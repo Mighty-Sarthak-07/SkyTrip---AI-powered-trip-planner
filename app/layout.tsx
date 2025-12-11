@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fugaz_One } from "next/font/google";
 import "./globals.css";
 import Provider from "./provider";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const fugazOne = Fugaz_One({
   variable: "--font-fugaz-one",
@@ -20,7 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <ClerkProvider>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={fugazOne.className}
       >
@@ -29,5 +31,6 @@ export default function RootLayout({
         </Provider>
       </body>
     </html>
+    </ClerkProvider>
   );
 }
