@@ -1,9 +1,22 @@
 "use client"
-import React, { useState } from 'react'
-import { Pencil, Send, Globe, MapPin, Sparkles, Mountain, LucideIcon, ChevronDown } from 'lucide-react'
 import { HeroVideoDialog } from '@/components/ui/hero-video-dialog'
+import { useUser } from '@clerk/nextjs'
+import { ChevronDown, Globe, MapPin, Mountain, Pencil, Send, Sparkles } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 const Hero = () => {
+
+  const user = useUser();
+  const router = useRouter();
+  const onSend = () => {
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+    router.push('/trip');
+
+  }
   const [inputValue, setInputValue] = useState('')
 
   const quickActions = [
@@ -65,7 +78,7 @@ const Hero = () => {
             />
             <button
               className='ml-3 w-12 h-12 rounded-full bg-primary hover:bg-[#FF5A3A] transition-colors flex items-center justify-center text-white shadow-md'
-              aria-label='Submit'
+              aria-label='Submit' onClick={() => onSend()}
             >
               <Send className='w-5 h-5' />
             </button>
@@ -77,7 +90,7 @@ const Hero = () => {
           {quickActions.map((action, index) => {
             const IconComponent = action.icon
             const BadgeIcon = action.badge?.icon
-            
+
             return (
               <button
                 key={index}

@@ -1,14 +1,14 @@
 "use client";
 
 import {
-    Facebook,
-    Globe,
-    Instagram,
-    Linkedin,
-    Mail,
-    MapPin,
-    Phone,
-    Twitter
+  Facebook,
+  Globe,
+  Instagram,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+  Twitter
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -53,7 +53,7 @@ export default function Footer() {
 
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-      
+
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
           {/* Brand Section */}
