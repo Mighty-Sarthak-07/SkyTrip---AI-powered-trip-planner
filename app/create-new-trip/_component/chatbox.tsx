@@ -1,7 +1,8 @@
 "use client"
 import axios from 'axios'
-import { Pencil, Send } from 'lucide-react'
+import { Loader2, Pencil, Send } from 'lucide-react'
 import { useState } from 'react'
+import EmptyBoxState from './EmptyBoxstate'
 
 type Message = {
     role: string;
@@ -12,43 +13,52 @@ const Chatbox = () => {
     const [userInput, setUserInput] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
-    const onSend = async () => {
-        if (!userInput?.trim()) return;
+    const onSend = async (input?: string) => {
+        const msgContent = input || userInput;
+        if (!msgContent?.trim()) return;
 
-        const newMsg: Message = { role: 'user', content: userInput };
+        const newMsg: Message = { role: 'user', content: msgContent };
         setMessages((prev) => [...prev, newMsg]);
         setUserInput('');
+        setLoading(true);
+        const result = await axios.post('/api/aimodel', {
+            messages: [...messages, newMsg]
+        });
 
-        try {
-            setLoading(true);
-            const result = await axios.post('/api/aimodel', {
-                messages: [...messages, newMsg]
-            });
-
-            setMessages((prev) => [...prev, {
-                role: 'assistant',
-                content: result.data.response
-            }]);
-            console.log(result.data);
-            setLoading(false);
-        } catch (error: any) {
-            console.error("API Error:", error);
-            alert("Error generating trip: " + (error.response?.data?.error || error.message));
-            setLoading(false);
-        }
+        setMessages((prev: Message[]) => [...prev, {
+            role: 'assistant',
+            content: result?.data?.resp
+        }]);
+        console.log(result.data);
+        setLoading(false);
 
     }
     return (
         <div className='h-[84vh] flex flex-col'>
+            {messages?.length == 0 && <EmptyBoxState onSelectOption={(v: string) => onSend(v)} />}
             <section className='flex-1 overflow-y-auto p-4'>
                 <div className="flex flex-col gap-2">
-                    {messages.map((msg, index) => (
-                        <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mt-2`}>
-                            <div className={`max-w-xl py-2 px-4 rounded-lg ${msg.role === 'user' ? 'bg-primary text-white' : 'bg-gray-100 text-black'}`}>
-                                {!loading ? msg.content : <span className='animate-pulse'>...</span>}
+                    {messages.map((msg: Message, index) => (
+                        msg.role === 'user' ?
+                            <div key={index} className='flex justify-end mt-2'>
+                                <div className='max-w-xl py-2 px-4 rounded-lg bg-primary text-white'>
+                                    {msg.content}
+                                </div>
+                            </div> :
+                            <div key={index} className='flex justify-start mt-2'>
+                                <div className='max-w-xl py-2 px-4 rounded-lg bg-gray-100 text-black'>
+                                    {msg.content}
+                                </div>
+                            </div>
+                    ))}
+                    {loading && (
+                        <div className='flex justify-start mt-2'>
+                            <div className='bg-gray-100 text-black py-2 px-4 rounded-lg flex items-center gap-2'>
+                                <Loader2 className='animate-spin w-5 h-5' />
+                                <span className='text-sm'>Thinking...</span>
                             </div>
                         </div>
-                    ))}
+                    )}
                 </div>
             </section>
             <section>
