@@ -1,18 +1,24 @@
 "use client"
 import axios from 'axios'
 import { Loader2, Pencil, Send } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import EmptyBoxState from './EmptyBoxstate'
+import Budget from './Budget'
+import GroupSize from './GroupSize'
+import Duration from './Duration'
+import FinalUI from './FinalUI'
 
 type Message = {
     role: string;
     content: string;
+    ui?:string;
 }
 const Chatbox = () => {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [userInput, setUserInput] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
-
+    const [userInput, setUserInput] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [isFinal, setIsFinal] = useState(false);
+    const [tripDetail, setTripDetail] = useState();
     const onSend = async (input?: string) => {
         const msgContent = input || userInput;
         if (!msgContent?.trim()) return;
@@ -22,17 +28,50 @@ const Chatbox = () => {
         setUserInput('');
         setLoading(true);
         const result = await axios.post('/api/aimodel', {
-            messages: [...messages, newMsg]
+            messages: [...messages, newMsg],
+            isFinal : isFinal
         });
-
-        setMessages((prev: Message[]) => [...prev, {
+        console.log("TRIP",result.data);
+        !isFinal && setMessages((prev: Message[]) => [...prev, {
             role: 'assistant',
-            content: result?.data?.resp
+            content: result?.data?.resp,
+            ui: result?.data?.ui
         }]);
-        console.log(result.data);
+        if(isFinal){
+            setTripDetail(result?.data?.trip_plan);
+        }
+        
         setLoading(false);
 
     }
+    const RendergenUI = (ui:string|undefined) => {
+        if(ui=="budget"){
+            return <Budget onSelectOption={(v: string) => setUserInput(v)} />
+        }
+        else if(ui=="groupSize"){
+            return <GroupSize onSelectOption={(v: string) =>(setUserInput(v))} />
+        }
+        else if(ui=="duration"){
+            return <Duration onSelectOption={(v: string) =>(setUserInput(v))} />
+        }
+        else if(ui=='final'){
+            return <FinalUI viewTripPlan={()=>console.log()} disable={!tripDetail} />
+        }
+        return null;
+    }
+    useEffect(() => {
+        const lastMsg = messages[messages.length - 1];
+        if(lastMsg?.ui === 'final'){
+           setIsFinal(true);
+           setUserInput('Ok, Great!');
+        }
+    }, [messages])
+
+    useEffect(() => {
+        if(isFinal && userInput){
+            onSend();
+        }
+    }, [isFinal])
     return (
         <div className='h-[84vh] flex flex-col'>
             {messages?.length == 0 && <EmptyBoxState onSelectOption={(v: string) => onSend(v)} />}
@@ -48,6 +87,7 @@ const Chatbox = () => {
                             <div key={index} className='flex justify-start mt-2'>
                                 <div className='max-w-xl py-2 px-4 rounded-lg bg-gray-100 text-black'>
                                     {msg.content}
+                                    {RendergenUI(msg.ui??"")}
                                 </div>
                             </div>
                     ))}

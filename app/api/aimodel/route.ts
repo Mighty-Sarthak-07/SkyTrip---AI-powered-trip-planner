@@ -25,6 +25,54 @@ Follow this strict conversation flow to gather necessary details. ASK ONLY ONE Q
   "ui": "Current UI state (location | destination | groupSize | budget | duration | interests | final)"
 }`
 
+const FINAL_PROMPT = `Generate Travel Plan with give details, give me Hotels options list with HotelName,
+Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and suggest itinerary with PlaceName, Place Details, Place Image Url,
+Geo Coordinates, Place address, ticket Pricing, Time travel each of the location , with each day plan with best time to visit in JSON format.
+Output Schema:
+
+{
+  "destination": "string",
+  "duration": "string",
+  "budget": "string",
+  "people_size": "string",
+  "hotels": [
+    {
+      "hotel_name": "string",
+      "hotel_address": "string",
+      "price_per_night": "string",
+      "hotel_image_url": "string",
+      "geo_coordinates": {
+        "latitude": "number",
+        "longitude": "number"
+      },
+      "rating": "number",
+      "description": "string"
+    }
+  ],
+  "itinerary": [
+    {
+      "day": "number",
+      "day_plan": "string",
+      "best_time_to_visit_day": "string",
+      "activities": [
+        {
+          "place_name": "string",
+          "place_details": "string",
+          "place_image_url": "string",
+          "geo_coordinates": {
+            "latitude": "number",
+            "longitude": "number"
+          },
+          "place_address": "string",
+          "ticket_pricing": "string",
+          "time_travel_each_location": "string",
+          "best_time_to_visit": "string"
+        }
+      ]
+    }
+  ]
+}
+`
 
 
 export async function POST(req: NextRequest) {
@@ -35,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { messages } = await req.json();
+        const { messages, isFinal } = await req.json();
 
         const openai = new OpenAI({
             baseURL: "https://openrouter.ai/api/v1",
@@ -48,7 +96,7 @@ export async function POST(req: NextRequest) {
             messages: [
                 {
                     "role": "system",
-                    "content": PROMPT
+                    "content": isFinal ? FINAL_PROMPT : PROMPT
                 },
                 ...messages
             ]
