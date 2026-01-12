@@ -26,7 +26,7 @@ const GroupSize = ({ onSelectOption }: any ) => {
         },
         {
             id: 'friends',
-            title: 'Friends',
+            title: 'Friends - 6 to 10',
             icon: '⛵',
             desc: 'Thrill seekers',
         }

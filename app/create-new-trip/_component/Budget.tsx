@@ -8,7 +8,7 @@ const Budget = ({ onSelectOption }:any) => {
     const options = [
         {
             id: 'low',
-            title: 'Cheap',
+            title: 'Low',
             icon: '💵',
             desc: 'Stay conscious of costs',
         },
@@ -20,9 +20,9 @@ const Budget = ({ onSelectOption }:any) => {
         },
         {
             id: 'high',
-            title: 'Luxury',
+            title: 'High',
             icon: '💸',
-            desc: 'Don\'t worry about cost',
+            desc: 'Do not worry about cost',
         }
     ];
 
@@ -43,7 +43,7 @@ const Budget = ({ onSelectOption }:any) => {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => {
                             setSelected(option.id);
-                            onSelectOption(option.title);
+                            onSelectOption(option.title + "-" + option.desc);
                         }}
                         className={`
               p-5 rounded-lg border-2 cursor-pointer flex flex-col items-start gap-2 transition-all duration-300

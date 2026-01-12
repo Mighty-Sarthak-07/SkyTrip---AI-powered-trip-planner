@@ -2,23 +2,37 @@
 import axios from 'axios'
 import { Loader2, Pencil, Send } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import EmptyBoxState from './EmptyBoxstate'
 import Budget from './Budget'
-import GroupSize from './GroupSize'
 import Duration from './Duration'
+import EmptyBoxState from './EmptyBoxstate'
 import FinalUI from './FinalUI'
+import GroupSize from './GroupSize'
 
 type Message = {
     role: string;
     content: string;
-    ui?:string;
+    ui?: string;
 }
+
+export type TripInfo = {
+    budget: string;
+    destination: string;
+    duration: string;
+    group_size: string;
+    origin: string;
+    hotels: any;
+    itinerary: any;
+}
+
 const Chatbox = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [userInput, setUserInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [isFinal, setIsFinal] = useState(false);
-    const [tripDetail, setTripDetail] = useState();
+    const [tripDetail, setTripDetail] = useState<TripInfo>();
+
+
+
     const onSend = async (input?: string) => {
         const msgContent = input || userInput;
         if (!msgContent?.trim()) return;
@@ -29,46 +43,46 @@ const Chatbox = () => {
         setLoading(true);
         const result = await axios.post('/api/aimodel', {
             messages: [...messages, newMsg],
-            isFinal : isFinal
+            isFinal: isFinal
         });
-        console.log("TRIP",result.data);
+        console.log("TRIP", result.data);
         !isFinal && setMessages((prev: Message[]) => [...prev, {
             role: 'assistant',
             content: result?.data?.resp,
             ui: result?.data?.ui
         }]);
-        if(isFinal){
+        if (isFinal) {
             setTripDetail(result?.data?.trip_plan);
         }
-        
+
         setLoading(false);
 
     }
-    const RendergenUI = (ui:string|undefined) => {
-        if(ui=="budget"){
+    const RendergenUI = (ui: string | undefined) => {
+        if (ui == "budget") {
             return <Budget onSelectOption={(v: string) => setUserInput(v)} />
         }
-        else if(ui=="groupSize"){
-            return <GroupSize onSelectOption={(v: string) =>(setUserInput(v))} />
+        else if (ui == "groupSize") {
+            return <GroupSize onSelectOption={(v: string) => (setUserInput(v))} />
         }
-        else if(ui=="duration"){
-            return <Duration onSelectOption={(v: string) =>(setUserInput(v))} />
+        else if (ui == "duration") {
+            return <Duration onSelectOption={(v: string) => (setUserInput(v))} />
         }
-        else if(ui=='final'){
-            return <FinalUI viewTripPlan={()=>console.log()} disable={!tripDetail} />
+        else if (ui == 'final') {
+            return <FinalUI viewTripPlan={() => console.log()} disable={!tripDetail} />
         }
         return null;
     }
     useEffect(() => {
         const lastMsg = messages[messages.length - 1];
-        if(lastMsg?.ui === 'final'){
-           setIsFinal(true);
-           setUserInput('Ok, Great!');
+        if (lastMsg?.ui === 'final') {
+            setIsFinal(true);
+            setUserInput('Ok, Great!');
         }
     }, [messages])
 
     useEffect(() => {
-        if(isFinal && userInput){
+        if (isFinal && userInput) {
             onSend();
         }
     }, [isFinal])
@@ -87,7 +101,7 @@ const Chatbox = () => {
                             <div key={index} className='flex justify-start mt-2'>
                                 <div className='max-w-xl py-2 px-4 rounded-lg bg-gray-100 text-black'>
                                     {msg.content}
-                                    {RendergenUI(msg.ui??"")}
+                                    {RendergenUI(msg.ui ?? "")}
                                 </div>
                             </div>
                     ))}
