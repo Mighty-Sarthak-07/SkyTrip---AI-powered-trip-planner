@@ -12,7 +12,6 @@ export const createTripDetail = mutation({
             tripId: args.tripId,
             uid: args.uid,
             tripDetail: args.tripDetail,
-        });
-        return result;
+        }); 
     }
 });

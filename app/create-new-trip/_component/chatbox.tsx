@@ -1,12 +1,17 @@
 "use client"
+import { useUserDetail } from '@/app/provider'
+import { api } from '@/convex/_generated/api'
 import axios from 'axios'
+import { useMutation } from 'convex/react'
 import { Loader2, Pencil, Send } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import Budget from './Budget'
 import Duration from './Duration'
 import EmptyBoxState from './EmptyBoxstate'
 import FinalUI from './FinalUI'
 import GroupSize from './GroupSize'
+
 
 type Message = {
     role: string;
@@ -30,8 +35,8 @@ const Chatbox = () => {
     const [loading, setLoading] = useState(false);
     const [isFinal, setIsFinal] = useState(false);
     const [tripDetail, setTripDetail] = useState<TripInfo>();
-
-
+    const { userDetail, setUserDetail } = useUserDetail();
+    const SaveTripDetail = useMutation(api.tripDetail.createTripDetail);
 
     const onSend = async (input?: string) => {
         const msgContent = input || userInput;
@@ -51,8 +56,14 @@ const Chatbox = () => {
             content: result?.data?.resp,
             ui: result?.data?.ui
         }]);
-        if (isFinal) {
-            setTripDetail(result?.data?.trip_plan);
+        if (isFinal && result?.data && userDetail?._id) {
+            setTripDetail(result?.data);
+            const tripId = uuidv4();
+            await SaveTripDetail({
+                tripDetail: result?.data,
+                tripId: tripId,
+                uid: userDetail?._id,
+            });
         }
 
         setLoading(false);

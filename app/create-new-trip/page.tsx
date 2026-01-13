@@ -1,7 +1,7 @@
 
 "use client"
 import Chatbox from './_component/chatbox'
-
+import Itinerary from './_component/Itinerary'
 const CreateNewTrip = () => {
   return (
     <div>
@@ -9,8 +9,8 @@ const CreateNewTrip = () => {
         <div className='sticky top-10'>
           <Chatbox />
         </div>
-        <div className='h-[200vh]'>
-
+        <div className='h-[85vh] overflow-y-scroll sticky top-10'>
+          <Itinerary />
         </div>
       </div>
     </div>
