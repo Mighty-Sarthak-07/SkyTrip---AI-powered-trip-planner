@@ -1,7 +1,10 @@
+
+"use client";
 import { Timeline } from "@/components/ui/timeline";
 
 const TRIP_DATA = {
     budget: "Low",
+    origin: "Delhi",
     destination: "Mumbai",
     duration: "5 Days",
     hotels: [

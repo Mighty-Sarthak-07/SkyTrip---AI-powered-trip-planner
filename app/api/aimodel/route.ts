@@ -30,7 +30,7 @@ Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and
 Geo Coordinates, Place address, ticket Pricing, Time travel each of the location , with each day plan with best time to visit in JSON format.
 Output Schema:
 
-{
+{ "origin": "string",
   "destination": "string",
   "duration": "string",
   "budget": "string",
