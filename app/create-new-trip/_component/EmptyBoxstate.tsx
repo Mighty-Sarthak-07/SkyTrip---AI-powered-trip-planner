@@ -55,7 +55,7 @@ const EmptyBoxState = ({ onSelectOption }: any) => {
                         <div className={`p-4 rounded-full mb-3 ${option.bgColor} group-hover:rotate-12 transition-transform duration-300`}>
                             <option.icon className={`w-8 h-8 ${option.color}`} />
                         </div>
-                        <h2 className='font-bold text-lg text-gray-800 group-hover:text-primary transition-colors'>{option.name}</h2>
+                        <h2 className='font-bold text-md text-gray-800 group-hover:text-primary transition-colors'>{option.name}</h2>
                     </div>
                 ))}
             </div>

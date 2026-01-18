@@ -25,9 +25,42 @@ export type TripInfo = {
     duration: string;
     group_size: string;
     origin: string;
-    hotels: any;
-    itinerary: any;
+    hotels: Hotel[];
+    itinerary: Itinerary[];
 }
+type Hotel = {
+
+    hotel_name: string;
+    hotel_address: string;
+    price_per_night: number;
+    rating: number,
+    hotel_image_url: string,
+    description: string,
+    geo_coordinates: {
+        latitude: number,
+        longitude: number,
+    },
+}
+type Activity = {
+    best_time_to_visit: string,
+    geo_coordinates: {
+                        latitude: number,
+                        longitude: number,
+                    },
+    place_address: string,
+    place_details:string,
+    place_image_url:string,
+    place_name: string,
+    ticket_pricing: string,
+    time_travel_each_location: string,
+}
+type Itinerary = {
+    best_time_to_visit_day: string,
+    day: number,
+    day_plan: string,
+    activities: Activity[];
+}
+
 
 const Chatbox = () => {
     const [messages, setMessages] = useState<Message[]>([]);

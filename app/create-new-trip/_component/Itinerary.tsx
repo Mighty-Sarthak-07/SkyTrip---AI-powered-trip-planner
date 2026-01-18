@@ -1,6 +1,11 @@
 
 "use client";
 import { Timeline } from "@/components/ui/timeline";
+import { Clock, ExternalLink, MapPin, Star, Ticket, X } from "lucide-react";
+import Image from "next/image";
+import React from "react";
+import HotelCard from "./HotelCard";
+import ActivityCard from "./ActivityCard";
 
 const TRIP_DATA = {
     budget: "Low",
@@ -18,7 +23,7 @@ const TRIP_DATA = {
             hotel_address:
                 "Next to Dadar Station, Dadar East, Mumbai",
             hotel_image_url:
-                "https://example.com/hotel-surestay.jpg",
+                "https://google.com/hotel-surestay.jpg",
             hotel_name: "Hotel SureStay",
             price_per_night: "$30",
             rating: 4,
@@ -32,7 +37,7 @@ const TRIP_DATA = {
             },
             hotel_address: "Near Atria Mall, Worli, Mumbai",
             hotel_image_url:
-                "https://example.com/residency-hotel.jpg",
+                "https://google.com/residency-hotel.jpg",
             hotel_name: "Residency Hotel",
             price_per_night: "$40",
             rating: 4.5,
@@ -47,7 +52,7 @@ const TRIP_DATA = {
             hotel_address:
                 "Near Mumbai Airport, Andheri East, Mumbai",
             hotel_image_url:
-                "https://example.com/hotel-transit.jpg",
+                "https://google.com/hotel-transit.jpg",
             hotel_name: "Hotel Transit",
             price_per_night: "$35",
             rating: 4.2,
@@ -66,7 +71,7 @@ const TRIP_DATA = {
                     place_details:
                         "Famous beach known for its street food and vibrant atmosphere.",
                     place_image_url:
-                        "https://example.com/juhu-beach.jpg",
+                        "https://google.com/juhu-beach.jpg",
                     place_name: "Juhu Beach",
                     ticket_pricing: "Free",
                     time_travel_each_location: "1 hour from hotel",
@@ -89,7 +94,7 @@ const TRIP_DATA = {
                     place_details:
                         "One of the most famous Ganesh temples in Mumbai.",
                     place_image_url:
-                        "https://example.com/siddhivinayak.jpg",
+                        "https://google.com/siddhivinayak.jpg",
                     place_name: "Siddhivinayak Temple",
                     ticket_pricing: "Free",
                     time_travel_each_location:
@@ -105,7 +110,7 @@ const TRIP_DATA = {
                     place_details:
                         "Historic ice cream parlour famous for its unique ice cream sandwiches.",
                     place_image_url:
-                        "https://example.com/k-rustoms.jpg",
+                        "https://google.com/k-rustoms.jpg",
                     place_name: "K. Rustom's Ice Cream",
                     ticket_pricing: "Approx. $2",
                     time_travel_each_location:
@@ -129,7 +134,7 @@ const TRIP_DATA = {
                     place_details:
                         "Iconic beach known for its bhel puri and other local snacks.",
                     place_image_url:
-                        "https://example.com/chowpatty.jpg",
+                        "https://google.com/chowpatty.jpg",
                     place_name: "Chowpatty Beach",
                     ticket_pricing: "Free",
                     time_travel_each_location:
@@ -154,7 +159,7 @@ const TRIP_DATA = {
                     place_details:
                         "Famous market for shopping and tasting local food.",
                     place_image_url:
-                        "https://example.com/crawford-market.jpg",
+                        "https://google.com/crawford-market.jpg",
                     place_name: "Crawford Market",
                     ticket_pricing: "Free entry",
                     time_travel_each_location:
@@ -178,7 +183,7 @@ const TRIP_DATA = {
                     place_details:
                         "One of the largest slums in Asia, known for its local food tours.",
                     place_image_url:
-                        "https://example.com/dharavi.jpg",
+                        "https://google.com/dharavi.jpg",
                     place_name: "Dharavi",
                     ticket_pricing:
                         "Approx. $10 for guided food tour",
@@ -195,156 +200,134 @@ const TRIP_DATA = {
 }
 
 const Itinerary = () => {
+    const [selectedHotel, setSelectedHotel] = React.useState<any>(null);
+    const [selectedActivity, setSelectedActivity] = React.useState<any>(null);
+
     const data = [
         {
-            title: "2024",
+            title: "Recommended Hotels",
             content: (
-                <div>
-                    <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
-                        Built and launched Aceternity UI and Aceternity UI Pro from scratch
-                    </p>
-                    <div className="grid grid-cols-2 gap-4">
-                        <img
-                            src="https://assets.aceternity.com/templates/startup-1.webp"
-                            alt="startup template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/templates/startup-2.webp"
-                            alt="startup template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/templates/startup-3.webp"
-                            alt="startup template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/templates/startup-4.webp"
-                            alt="startup template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {TRIP_DATA.hotels.map((hotel, index) => (
+                        <div key={index} className="group bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300">
+                            <div className="relative overflow-hidden rounded-xl aspect-[4/3] mb-4">
+                                <Image
+                                    src={'/placeholder.png'}
+                                    alt={hotel.hotel_name}
+                                    width={400}
+                                    height={300}
+                                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                                />
+                                <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1">
+                                    <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                                    <span className="text-white text-xs font-medium">{hotel.rating}</span>
+                                </div>
+                            </div>
+
+                            <h2 className="font-bold text-lg text-neutral-800 dark:text-neutral-100 mb-1 line-clamp-1">{hotel.hotel_name}</h2>
+
+                            <div className="flex items-start gap-1 mb-3 text-neutral-500 dark:text-neutral-400">
+                                <MapPin className="w-3 h-3 mt-1 flex-shrink-0" />
+                                <p className="text-sm line-clamp-1">{hotel.hotel_address}</p>
+                            </div>
+
+                            <div className="flex justify-between items-center mt-auto">
+                                <p className="text-primary font-bold text-lg">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
+                                <button
+                                    onClick={() => setSelectedHotel(hotel)}
+                                    className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
+                                >
+                                    View Hotel
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ),
         },
-        {
-            title: "Early 2023",
+        ...TRIP_DATA?.itinerary?.map((dayData) => ({
+            title: `Day ${dayData.day}`,
             content: (
-                <div>
-                    <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
-                        I usually run out of copy, but when I see content this big, I try to
-                        integrate lorem ipsum.
-                    </p>
-                    <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
-                        Lorem ipsum is for people who are too lazy to write copy. But we are
-                        not. Here are some more example of beautiful designs I built.
-                    </p>
-                    <div className="grid grid-cols-2 gap-4">
-                        <img
-                            src="https://assets.aceternity.com/pro/hero-sections.png"
-                            alt="hero template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/features-section.png"
-                            alt="feature template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/pro/bento-grids.png"
-                            alt="bento template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/cards.png"
-                            alt="cards template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
+                <div className="flex flex-col gap-6">
+                    <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/50 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="bg-orange-100 dark:bg-orange-800 text-orange-700 dark:text-orange-200 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                                <Clock className="w-3 h-3" /> Best Time
+                            </span>
+                            <span className="text-orange-900 dark:text-orange-100 font-semibold tracking-wide">
+                                {dayData.best_time_to_visit_day}
+                            </span>
+                        </div>
+                        <p className="text-neutral-700 dark:text-neutral-300 text-lg leading-relaxed font-medium">
+                            {dayData.day_plan}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {dayData?.activities.map((activities, index) => (
+                            <div
+                                key={index}
+                                className="group bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                            >
+                                <div className="relative overflow-hidden rounded-xl aspect-[16/10] mb-4">
+                                    <Image
+                                        src={'/placeholder.png'}
+                                        alt={activities.place_name}
+                                        width={400}
+                                        height={200}
+                                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
+                                    />
+                                    <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/80 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                                        <span className="text-xs font-bold">4.5</span>
+                                    </div>
+                                </div>
+
+                                <div className="mb-2">
+                                    <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-100 leading-tight mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                                        {activities.place_name}
+                                    </h2>
+                                    <p className="text-neutral-500 dark:text-neutral-400 text-xs flex items-center gap-1">
+                                        <MapPin className="w-3 h-3" />
+                                        <span className="line-clamp-1">{activities.place_address}</span>
+                                    </p>
+                                </div>
+
+                                <div className="mt-auto space-y-3">
+                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                        <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-lg border border-neutral-100 dark:border-neutral-800">
+                                            <Ticket className="w-3.5 h-3.5 text-green-600" />
+                                            <span className="font-medium text-xs line-clamp-1">{activities.ticket_pricing}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-lg border border-neutral-100 dark:border-neutral-800">
+                                            <Clock className="w-3.5 h-3.5 text-blue-600" />
+                                            <span className="font-medium text-xs line-clamp-1">{activities.time_travel_each_location}</span>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setSelectedActivity(activities)}
+                                        className="w-full bg-neutral-900 dark:bg-white text-white dark:text-black py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white dark:group-hover:bg-primary dark:group-hover:text-white"
+                                    >
+                                        View Details
+                                        <ExternalLink className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             ),
-        },
-        {
-            title: "Changelog",
-            content: (
-                <div>
-                    <p className="mb-4 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
-                        Deployed 5 new components on Aceternity today
-                    </p>
-                    <div className="mb-8">
-                        <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
-                            ✅ Card grid component
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
-                            ✅ Startup template Aceternity
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
-                            ✅ Random file upload lol
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
-                            ✅ Himesh Reshammiya Music CD
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
-                            ✅ Salman Bhai Fan Club registrations open
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <img
-                            src="https://assets.aceternity.com/pro/hero-sections.png"
-                            alt="hero template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/features-section.png"
-                            alt="feature template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/pro/bento-grids.png"
-                            alt="bento template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                        <img
-                            src="https://assets.aceternity.com/cards.png"
-                            alt="cards template"
-                            width={500}
-                            height={500}
-                            className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-                        />
-                    </div>
-                </div>
-            ),
-        },
+        }))
     ];
+
     return (
         <div className="relative w-full overflow-clip">
             <Timeline data={data} tripData={TRIP_DATA} />
+            <HotelCard selectedHotel={selectedHotel} setSelectedHotel={setSelectedHotel} />
+           <ActivityCard selectedActivity={selectedActivity} setSelectedActivity={setSelectedActivity}/>
         </div>
     );
-
 }
 
 export default Itinerary
