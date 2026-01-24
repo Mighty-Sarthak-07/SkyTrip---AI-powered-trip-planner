@@ -1,13 +1,32 @@
+import axios from "axios";
 import { ExternalLink, MapPin, Star, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { useEffect, useState } from "react";
 interface HotelCardProps {
     selectedHotel: any;
     setSelectedHotel: (hotel: any) => void;
 }
 
+
 const HotelCard = ({ selectedHotel, setSelectedHotel }: HotelCardProps) => {
+
+    const [photoUrl, setPhotoUrl] = useState('/placeholder.png');
+
+    useEffect(() => {
+        if (selectedHotel) {
+            GetGooglePlaceDetail();
+        }
+    }, [selectedHotel])
+
+    const GetGooglePlaceDetail = async () => {
+        const result = await axios.post('/api/google-place-detail', { placeName: selectedHotel.hotel_name });
+        const photoUrl = result.data?.places[0]?.photos[0]?.name;
+        if (photoUrl) {
+            const PhotoUrl = `https://places.googleapis.com/v1/${photoUrl}/media?maxHeightPx=1000&maxWidthPx=1000&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`
+            setPhotoUrl(PhotoUrl);
+        }
+    }
     return (
         <div>
             {selectedHotel && (
@@ -21,7 +40,7 @@ const HotelCard = ({ selectedHotel, setSelectedHotel }: HotelCardProps) => {
                     >
                         <div className="relative h-64 w-full">
                             <Image
-                                src={'/placeholder.png'}
+                                src={photoUrl}
                                 alt={selectedHotel.hotel_name}
                                 fill
                                 className="object-cover"
