@@ -1,11 +1,12 @@
 
 "use client";
 import { Timeline } from "@/components/ui/timeline";
-import { Clock, ExternalLink, MapPin, Star, Ticket, X } from "lucide-react";
+import axios from "axios";
+import { Clock, ExternalLink, MapPin, Star, Ticket } from "lucide-react";
 import Image from "next/image";
-import React from "react";
-import HotelCard from "./HotelCard";
+import React, { useEffect, useState } from "react";
 import ActivityCard from "./ActivityCard";
+import HotelCard from "./HotelCard";
 
 const TRIP_DATA = {
     budget: "Low",
@@ -199,6 +200,127 @@ const TRIP_DATA = {
     people_size: "Solo",
 }
 
+const HotelGridItem = ({ hotel, index, setSelectedHotel }: { hotel: any, index: number, setSelectedHotel: (hotel: any) => void }) => {
+    const [photoUrl, setPhotoUrl] = useState<string>();
+
+    useEffect(() => {
+        hotel && GetGooglePlaceDetail();
+    }, [hotel]);
+
+    const GetGooglePlaceDetail = async () => {
+        try {
+            const result = await axios.post('/api/google-place-detail', { placeName: hotel?.hotel_name });
+            setPhotoUrl(result?.data);
+        } catch (error: any) {
+            console.error("Failed to fetch hotel details:", error);
+        }
+    }
+
+    return (
+        <div key={index} className="group bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300">
+            <div className="relative overflow-hidden rounded-xl aspect-[4/3] mb-4">
+                <Image
+                    src={photoUrl ? photoUrl : '/placeholder.png'}
+                    alt={hotel.hotel_name}
+                    width={400}
+                    height={300}
+                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1">
+                    <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                    <span className="text-white text-xs font-medium">{hotel.rating}</span>
+                </div>
+            </div>
+
+            <h2 className="font-bold text-lg text-neutral-800 dark:text-neutral-100 mb-1 line-clamp-1">{hotel.hotel_name}</h2>
+
+            <div className="flex items-start gap-1 mb-3 text-neutral-500 dark:text-neutral-400">
+                <MapPin className="w-3 h-3 mt-1 flex-shrink-0" />
+                <p className="text-sm line-clamp-1">{hotel.hotel_address}</p>
+            </div>
+
+            <div className="flex justify-between items-center mt-auto">
+                <p className="text-primary font-bold text-lg">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
+                <button
+                    onClick={() => setSelectedHotel(hotel)}
+                    className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
+                >
+                    View Hotel
+                </button>
+            </div>
+        </div>
+    )
+}
+
+const ActivityGridItem = ({ activity, index, setSelectedActivity }: { activity: any, index: number, setSelectedActivity: (activity: any) => void }) => {
+    const [photoUrl, setPhotoUrl] = useState<string>();
+
+    useEffect(() => {
+        activity && GetGooglePlaceDetail();
+    }, [activity]);
+
+    const GetGooglePlaceDetail = async () => {
+        try {
+            const result = await axios.post('/api/google-place-detail', { placeName: activity?.place_name });
+            setPhotoUrl(result?.data);
+        } catch (error: any) {
+            console.error("Failed to fetch activity details:", error);
+        }
+    }
+
+    return (
+        <div
+            key={index}
+            className="group bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+        >
+            <div className="relative overflow-hidden rounded-xl aspect-[16/10] mb-4">
+                <Image
+                    src={photoUrl ? photoUrl : '/placeholder.png'}
+                    alt={activity.place_name}
+                    width={400}
+                    height={200}
+                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/80 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                    <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                    <span className="text-xs font-bold">4.5</span>
+                </div>
+            </div>
+
+            <div className="mb-2">
+                <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-100 leading-tight mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                    {activity.place_name}
+                </h2>
+                <p className="text-neutral-500 dark:text-neutral-400 text-xs flex items-center gap-1">
+                    <MapPin className="w-3 h-3" />
+                    <span className="line-clamp-1">{activity.place_address}</span>
+                </p>
+            </div>
+
+            <div className="mt-auto space-y-3">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-lg border border-neutral-100 dark:border-neutral-800">
+                        <Ticket className="w-3.5 h-3.5 text-green-600" />
+                        <span className="font-medium text-xs line-clamp-1">{activity.ticket_pricing}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-lg border border-neutral-100 dark:border-neutral-800">
+                        <Clock className="w-3.5 h-3.5 text-blue-600" />
+                        <span className="font-medium text-xs line-clamp-1">{activity.time_travel_each_location}</span>
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => setSelectedActivity(activity)}
+                    className="w-full bg-neutral-900 dark:bg-white text-white dark:text-black py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white dark:group-hover:bg-primary dark:group-hover:text-white"
+                >
+                    View Details
+                    <ExternalLink className="w-4 h-4" />
+                </button>
+            </div>
+        </div>
+    )
+}
+
 const Itinerary = () => {
     const [selectedHotel, setSelectedHotel] = React.useState<any>(null);
     const [selectedActivity, setSelectedActivity] = React.useState<any>(null);
@@ -209,38 +331,7 @@ const Itinerary = () => {
             content: (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {TRIP_DATA.hotels.map((hotel, index) => (
-                        <div key={index} className="group bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300">
-                            <div className="relative overflow-hidden rounded-xl aspect-[4/3] mb-4">
-                                <Image
-                                    src={'/placeholder.png'}
-                                    alt={hotel.hotel_name}
-                                    width={400}
-                                    height={300}
-                                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
-                                />
-                                <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1">
-                                    <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                                    <span className="text-white text-xs font-medium">{hotel.rating}</span>
-                                </div>
-                            </div>
-
-                            <h2 className="font-bold text-lg text-neutral-800 dark:text-neutral-100 mb-1 line-clamp-1">{hotel.hotel_name}</h2>
-
-                            <div className="flex items-start gap-1 mb-3 text-neutral-500 dark:text-neutral-400">
-                                <MapPin className="w-3 h-3 mt-1 flex-shrink-0" />
-                                <p className="text-sm line-clamp-1">{hotel.hotel_address}</p>
-                            </div>
-
-                            <div className="flex justify-between items-center mt-auto">
-                                <p className="text-primary font-bold text-lg">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
-                                <button
-                                    onClick={() => setSelectedHotel(hotel)}
-                                    className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
-                                >
-                                    View Hotel
-                                </button>
-                            </div>
-                        </div>
+                        <HotelGridItem key={index} hotel={hotel} index={index} setSelectedHotel={setSelectedHotel} />
                     ))}
                 </div>
             ),
@@ -264,56 +355,8 @@ const Itinerary = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {dayData?.activities.map((activities, index) => (
-                            <div
-                                key={index}
-                                className="group bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
-                            >
-                                <div className="relative overflow-hidden rounded-xl aspect-[16/10] mb-4">
-                                    <Image
-                                        src={'/placeholder.png'}
-                                        alt={activities.place_name}
-                                        width={400}
-                                        height={200}
-                                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
-                                    />
-                                    <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/80 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-md">
-                                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                                        <span className="text-xs font-bold">4.5</span>
-                                    </div>
-                                </div>
-
-                                <div className="mb-2">
-                                    <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-100 leading-tight mb-1 line-clamp-1 group-hover:text-primary transition-colors">
-                                        {activities.place_name}
-                                    </h2>
-                                    <p className="text-neutral-500 dark:text-neutral-400 text-xs flex items-center gap-1">
-                                        <MapPin className="w-3 h-3" />
-                                        <span className="line-clamp-1">{activities.place_address}</span>
-                                    </p>
-                                </div>
-
-                                <div className="mt-auto space-y-3">
-                                    <div className="grid grid-cols-2 gap-2 text-sm">
-                                        <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-lg border border-neutral-100 dark:border-neutral-800">
-                                            <Ticket className="w-3.5 h-3.5 text-green-600" />
-                                            <span className="font-medium text-xs line-clamp-1">{activities.ticket_pricing}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-lg border border-neutral-100 dark:border-neutral-800">
-                                            <Clock className="w-3.5 h-3.5 text-blue-600" />
-                                            <span className="font-medium text-xs line-clamp-1">{activities.time_travel_each_location}</span>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        onClick={() => setSelectedActivity(activities)}
-                                        className="w-full bg-neutral-900 dark:bg-white text-white dark:text-black py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white dark:group-hover:bg-primary dark:group-hover:text-white"
-                                    >
-                                        View Details
-                                        <ExternalLink className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
+                        {dayData?.activities.map((activity, index) => (
+                            <ActivityGridItem key={index} activity={activity} index={index} setSelectedActivity={setSelectedActivity} />
                         ))}
                     </div>
                 </div>
@@ -325,9 +368,8 @@ const Itinerary = () => {
         <div className="relative w-full overflow-clip">
             <Timeline data={data} tripData={TRIP_DATA} />
             <HotelCard selectedHotel={selectedHotel} setSelectedHotel={setSelectedHotel} />
-           <ActivityCard selectedActivity={selectedActivity} setSelectedActivity={setSelectedActivity}/>
+            <ActivityCard selectedActivity={selectedActivity} setSelectedActivity={setSelectedActivity} />
         </div>
     );
 }
-
 export default Itinerary

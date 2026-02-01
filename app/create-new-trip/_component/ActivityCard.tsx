@@ -1,14 +1,32 @@
+"use client"
 import { ExternalLink, MapPin, Star, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 interface ActivityCardProps {
     selectedActivity: any;
     setSelectedActivity: (activity: any) => void;
 }
 
+
 const ActivityCard = ({ selectedActivity, setSelectedActivity }: ActivityCardProps) => {
+    const [photoUrl, setPhotoUrl] = useState<string>();
+
+    useEffect(() => {
+        selectedActivity && GetGooglePlaceDetail();
+    }, [selectedActivity])
+
+    const GetGooglePlaceDetail = async () => {
+        try {
+            const result = await axios.post('/api/google-place-detail', { placeName: selectedActivity?.place_name+":"+selectedActivity?.place_address });
+            console.log(result?.data);
+            setPhotoUrl(result?.data);
+        } catch (error: any) {
+            console.error("Failed to fetch hotel details:", error);
+        }
+    }
   return (
     <div> {selectedActivity && (
                 <div
@@ -21,7 +39,7 @@ const ActivityCard = ({ selectedActivity, setSelectedActivity }: ActivityCardPro
                     >
                         <div className="relative h-64 w-full">
                             <Image
-                                src={'/placeholder.png'}
+                                src={photoUrl? photoUrl : '/placeholder.png'}
                                 alt={selectedActivity.place_name}
                                 fill
                                 className="object-cover"
