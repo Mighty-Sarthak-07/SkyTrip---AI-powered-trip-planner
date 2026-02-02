@@ -26,8 +26,8 @@ Follow this strict conversation flow to gather necessary details. ASK ONLY ONE Q
 }`
 
 const FINAL_PROMPT = `Generate Travel Plan with give details, give me Hotels options list with HotelName,
-Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and suggest itinerary with PlaceName, Place Details, Place Image Url,
-Geo Coordinates, Place address, ticket Pricing, Time travel each of the location , with each day plan with best time to visit in JSON format.
+Hotel address, Price in INR or USD if outside country, hotel image url, geo coordinates, rating, descriptions and suggest itinerary with PlaceName, Place Details, Place Image Url,
+Geo Coordinates, Place address, ticket Pricing in INR or USD if outside country, Time travel each of the location , with each day plan with best time to visit in JSON format.
 Output Schema:
 
 { "origin": "string",

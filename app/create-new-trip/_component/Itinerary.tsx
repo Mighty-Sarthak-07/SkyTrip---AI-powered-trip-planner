@@ -2,203 +2,205 @@
 "use client";
 import { Timeline } from "@/components/ui/timeline";
 import axios from "axios";
-import { Clock, ExternalLink, MapPin, Star, Ticket } from "lucide-react";
+import { Clock, ExternalLink, MapPin, Star, Ticket, Wallet } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ActivityCard from "./ActivityCard";
 import HotelCard from "./HotelCard";
+import { useTripDetail } from "@/app/provider";
+import { TripInfo } from "./chatbox";
 
-const TRIP_DATA = {
-    budget: "Low",
-    origin: "Delhi",
-    destination: "Mumbai",
-    duration: "5 Days",
-    hotels: [
-        {
-            description:
-                "Budget-friendly hotel with clean rooms, located close to Dadar Station.",
-            geo_coordinates: {
-                latitude: 19.013,
-                longitude: 72.847,
-            },
-            hotel_address:
-                "Next to Dadar Station, Dadar East, Mumbai",
-            hotel_image_url:
-                "https://google.com/hotel-surestay.jpg",
-            hotel_name: "Hotel SureStay",
-            price_per_night: "$30",
-            rating: 4,
-        },
-        {
-            description:
-                "Comfortable stay with in-house dining, located near popular shopping areas.",
-            geo_coordinates: {
-                latitude: 19.006,
-                longitude: 72.8288,
-            },
-            hotel_address: "Near Atria Mall, Worli, Mumbai",
-            hotel_image_url:
-                "https://google.com/residency-hotel.jpg",
-            hotel_name: "Residency Hotel",
-            price_per_night: "$40",
-            rating: 4.5,
-        },
-        {
-            description:
-                "Ideal for travelers, close to the airport with easy access to local eateries.",
-            geo_coordinates: {
-                latitude: 19.0998,
-                longitude: 72.876,
-            },
-            hotel_address:
-                "Near Mumbai Airport, Andheri East, Mumbai",
-            hotel_image_url:
-                "https://google.com/hotel-transit.jpg",
-            hotel_name: "Hotel Transit",
-            price_per_night: "$35",
-            rating: 4.2,
-        },
-    ],
-    itinerary: [
-        {
-            activities: [
-                {
-                    best_time_to_visit: "Evening",
-                    geo_coordinates: {
-                        latitude: 19.103,
-                        longitude: 72.8258,
-                    },
-                    place_address: "Juhu Tara Rd, Juhu, Mumbai",
-                    place_details:
-                        "Famous beach known for its street food and vibrant atmosphere.",
-                    place_image_url:
-                        "https://google.com/juhu-beach.jpg",
-                    place_name: "Juhu Beach",
-                    ticket_pricing: "Free",
-                    time_travel_each_location: "1 hour from hotel",
-                },
-            ],
-            best_time_to_visit_day: "Evening",
-            day: 1,
-            day_plan: "Explore street food in Juhu Beach",
-        },
-        {
-            activities: [
-                {
-                    best_time_to_visit: "Morning",
-                    geo_coordinates: {
-                        latitude: 19.0144,
-                        longitude: 72.8266,
-                    },
-                    place_address:
-                        "Siddhivinayak Temple Rd, Prabhadevi, Mumbai",
-                    place_details:
-                        "One of the most famous Ganesh temples in Mumbai.",
-                    place_image_url:
-                        "https://google.com/siddhivinayak.jpg",
-                    place_name: "Siddhivinayak Temple",
-                    ticket_pricing: "Free",
-                    time_travel_each_location:
-                        "30 minutes from hotel",
-                },
-                {
-                    best_time_to_visit: "Afternoon",
-                    geo_coordinates: {
-                        latitude: 18.9634,
-                        longitude: 72.8263,
-                    },
-                    place_address: "Marine Lines, Mumbai",
-                    place_details:
-                        "Historic ice cream parlour famous for its unique ice cream sandwiches.",
-                    place_image_url:
-                        "https://google.com/k-rustoms.jpg",
-                    place_name: "K. Rustom's Ice Cream",
-                    ticket_pricing: "Approx. $2",
-                    time_travel_each_location:
-                        "15 minutes from Siddhivinayak Temple",
-                },
-            ],
-            best_time_to_visit_day: "Morning",
-            day: 2,
-            day_plan:
-                "Visit Siddhivinayak Temple and explore local snacks",
-        },
-        {
-            activities: [
-                {
-                    best_time_to_visit: "Evening",
-                    geo_coordinates: {
-                        latitude: 18.9662,
-                        longitude: 72.8154,
-                    },
-                    place_address: "Chowpatty, Marine Drive, Mumbai",
-                    place_details:
-                        "Iconic beach known for its bhel puri and other local snacks.",
-                    place_image_url:
-                        "https://google.com/chowpatty.jpg",
-                    place_name: "Chowpatty Beach",
-                    ticket_pricing: "Free",
-                    time_travel_each_location:
-                        "30 minutes from hotel",
-                },
-            ],
-            best_time_to_visit_day: "Evening",
-            day: 3,
-            day_plan:
-                "Visit Chowpatty Beach for some evening snacks",
-        },
-        {
-            activities: [
-                {
-                    best_time_to_visit: "Afternoon",
-                    geo_coordinates: {
-                        latitude: 18.9612,
-                        longitude: 72.8347,
-                    },
-                    place_address:
-                        "Mahatma Jyotiba Phule Marg, T. M. S. No. 84, Mumbai",
-                    place_details:
-                        "Famous market for shopping and tasting local food.",
-                    place_image_url:
-                        "https://google.com/crawford-market.jpg",
-                    place_name: "Crawford Market",
-                    ticket_pricing: "Free entry",
-                    time_travel_each_location:
-                        "45 minutes from hotel",
-                },
-            ],
-            best_time_to_visit_day: "Afternoon",
-            day: 4,
-            day_plan:
-                "Explore the local markets and try street food",
-        },
-        {
-            activities: [
-                {
-                    best_time_to_visit: "Morning",
-                    geo_coordinates: {
-                        latitude: 19.0146,
-                        longitude: 72.8489,
-                    },
-                    place_address: "Dharavi, Mumbai",
-                    place_details:
-                        "One of the largest slums in Asia, known for its local food tours.",
-                    place_image_url:
-                        "https://google.com/dharavi.jpg",
-                    place_name: "Dharavi",
-                    ticket_pricing:
-                        "Approx. $10 for guided food tour",
-                    time_travel_each_location: "1 hour from hotel",
-                },
-            ],
-            best_time_to_visit_day: "Morning",
-            day: 5,
-            day_plan:
-                "Visit Dharavi and explore local culinary experiences",
-        },
-    ],
-    people_size: "Solo",
-}
+// const TRIP_DATA = {
+//     budget: "Low",
+//     origin: "Delhi",
+//     destination: "Mumbai",
+//     duration: "5 Days",
+//     hotels: [
+//         {
+//             description:
+//                 "Budget-friendly hotel with clean rooms, located close to Dadar Station.",
+//             geo_coordinates: {
+//                 latitude: 19.013,
+//                 longitude: 72.847,
+//             },
+//             hotel_address:
+//                 "Next to Dadar Station, Dadar East, Mumbai",
+//             hotel_image_url:
+//                 "https://google.com/hotel-surestay.jpg",
+//             hotel_name: "Hotel SureStay",
+//             price_per_night: "$30",
+//             rating: 4,
+//         },
+//         {
+//             description:
+//                 "Comfortable stay with in-house dining, located near popular shopping areas.",
+//             geo_coordinates: {
+//                 latitude: 19.006,
+//                 longitude: 72.8288,
+//             },
+//             hotel_address: "Near Atria Mall, Worli, Mumbai",
+//             hotel_image_url:
+//                 "https://google.com/residency-hotel.jpg",
+//             hotel_name: "Residency Hotel",
+//             price_per_night: "$40",
+//             rating: 4.5,
+//         },
+//         {
+//             description:
+//                 "Ideal for travelers, close to the airport with easy access to local eateries.",
+//             geo_coordinates: {
+//                 latitude: 19.0998,
+//                 longitude: 72.876,
+//             },
+//             hotel_address:
+//                 "Near Mumbai Airport, Andheri East, Mumbai",
+//             hotel_image_url:
+//                 "https://google.com/hotel-transit.jpg",
+//             hotel_name: "Hotel Transit",
+//             price_per_night: "$35",
+//             rating: 4.2,
+//         },
+//     ],
+//     itinerary: [
+//         {
+//             activities: [
+//                 {
+//                     best_time_to_visit: "Evening",
+//                     geo_coordinates: {
+//                         latitude: 19.103,
+//                         longitude: 72.8258,
+//                     },
+//                     place_address: "Juhu Tara Rd, Juhu, Mumbai",
+//                     place_details:
+//                         "Famous beach known for its street food and vibrant atmosphere.",
+//                     place_image_url:
+//                         "https://google.com/juhu-beach.jpg",
+//                     place_name: "Juhu Beach",
+//                     ticket_pricing: "Free",
+//                     time_travel_each_location: "1 hour from hotel",
+//                 },
+//             ],
+//             best_time_to_visit_day: "Evening",
+//             day: 1,
+//             day_plan: "Explore street food in Juhu Beach",
+//         },
+//         {
+//             activities: [
+//                 {
+//                     best_time_to_visit: "Morning",
+//                     geo_coordinates: {
+//                         latitude: 19.0144,
+//                         longitude: 72.8266,
+//                     },
+//                     place_address:
+//                         "Siddhivinayak Temple Rd, Prabhadevi, Mumbai",
+//                     place_details:
+//                         "One of the most famous Ganesh temples in Mumbai.",
+//                     place_image_url:
+//                         "https://google.com/siddhivinayak.jpg",
+//                     place_name: "Siddhivinayak Temple",
+//                     ticket_pricing: "Free",
+//                     time_travel_each_location:
+//                         "30 minutes from hotel",
+//                 },
+//                 {
+//                     best_time_to_visit: "Afternoon",
+//                     geo_coordinates: {
+//                         latitude: 18.9634,
+//                         longitude: 72.8263,
+//                     },
+//                     place_address: "Marine Lines, Mumbai",
+//                     place_details:
+//                         "Historic ice cream parlour famous for its unique ice cream sandwiches.",
+//                     place_image_url:
+//                         "https://google.com/k-rustoms.jpg",
+//                     place_name: "K. Rustom's Ice Cream",
+//                     ticket_pricing: "Approx. $2",
+//                     time_travel_each_location:
+//                         "15 minutes from Siddhivinayak Temple",
+//                 },
+//             ],
+//             best_time_to_visit_day: "Morning",
+//             day: 2,
+//             day_plan:
+//                 "Visit Siddhivinayak Temple and explore local snacks",
+//         },
+//         {
+//             activities: [
+//                 {
+//                     best_time_to_visit: "Evening",
+//                     geo_coordinates: {
+//                         latitude: 18.9662,
+//                         longitude: 72.8154,
+//                     },
+//                     place_address: "Chowpatty, Marine Drive, Mumbai",
+//                     place_details:
+//                         "Iconic beach known for its bhel puri and other local snacks.",
+//                     place_image_url:
+//                         "https://google.com/chowpatty.jpg",
+//                     place_name: "Chowpatty Beach",
+//                     ticket_pricing: "Free",
+//                     time_travel_each_location:
+//                         "30 minutes from hotel",
+//                 },
+//             ],
+//             best_time_to_visit_day: "Evening",
+//             day: 3,
+//             day_plan:
+//                 "Visit Chowpatty Beach for some evening snacks",
+//         },
+//         {
+//             activities: [
+//                 {
+//                     best_time_to_visit: "Afternoon",
+//                     geo_coordinates: {
+//                         latitude: 18.9612,
+//                         longitude: 72.8347,
+//                     },
+//                     place_address:
+//                         "Mahatma Jyotiba Phule Marg, T. M. S. No. 84, Mumbai",
+//                     place_details:
+//                         "Famous market for shopping and tasting local food.",
+//                     place_image_url:
+//                         "https://google.com/crawford-market.jpg",
+//                     place_name: "Crawford Market",
+//                     ticket_pricing: "Free entry",
+//                     time_travel_each_location:
+//                         "45 minutes from hotel",
+//                 },
+//             ],
+//             best_time_to_visit_day: "Afternoon",
+//             day: 4,
+//             day_plan:
+//                 "Explore the local markets and try street food",
+//         },
+//         {
+//             activities: [
+//                 {
+//                     best_time_to_visit: "Morning",
+//                     geo_coordinates: {
+//                         latitude: 19.0146,
+//                         longitude: 72.8489,
+//                     },
+//                     place_address: "Dharavi, Mumbai",
+//                     place_details:
+//                         "One of the largest slums in Asia, known for its local food tours.",
+//                     place_image_url:
+//                         "https://google.com/dharavi.jpg",
+//                     place_name: "Dharavi",
+//                     ticket_pricing:
+//                         "Approx. $10 for guided food tour",
+//                     time_travel_each_location: "1 hour from hotel",
+//                 },
+//             ],
+//             best_time_to_visit_day: "Morning",
+//             day: 5,
+//             day_plan:
+//                 "Visit Dharavi and explore local culinary experiences",
+//         },
+//     ],
+//     people_size: "Solo",
+// }
 
 const HotelGridItem = ({ hotel, index, setSelectedHotel }: { hotel: any, index: number, setSelectedHotel: (hotel: any) => void }) => {
     const [photoUrl, setPhotoUrl] = useState<string>();
@@ -240,7 +242,7 @@ const HotelGridItem = ({ hotel, index, setSelectedHotel }: { hotel: any, index: 
             </div>
 
             <div className="flex justify-between items-center mt-auto">
-                <p className="text-primary font-bold text-lg">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
+               <Wallet className="w-5 h-5 text-green-600" /> <p className="text-green-600 font-bold text-lg">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
                 <button
                     onClick={() => setSelectedHotel(hotel)}
                     className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
@@ -322,21 +324,27 @@ const ActivityGridItem = ({ activity, index, setSelectedActivity }: { activity: 
 }
 
 const Itinerary = () => {
+    //ts-ignore
+     const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
+     const [tripData,setTripData] = useState<TripInfo | null>(null);
     const [selectedHotel, setSelectedHotel] = React.useState<any>(null);
     const [selectedActivity, setSelectedActivity] = React.useState<any>(null);
 
-    const data = [
-        {
+    useEffect(() => {
+        tripDetailInfo && setTripData(tripDetailInfo);
+    }, [tripDetailInfo]);
+
+    const data = tripData?[{
             title: "Recommended Hotels",
             content: (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {TRIP_DATA.hotels.map((hotel, index) => (
+                    {tripData?.hotels.map((hotel, index) => (
                         <HotelGridItem key={index} hotel={hotel} index={index} setSelectedHotel={setSelectedHotel} />
                     ))}
                 </div>
             ),
         },
-        ...TRIP_DATA?.itinerary?.map((dayData) => ({
+        ...tripData?.itinerary?.map((dayData) => ({
             title: `Day ${dayData.day}`,
             content: (
                 <div className="flex flex-col gap-6">
@@ -362,11 +370,11 @@ const Itinerary = () => {
                 </div>
             ),
         }))
-    ];
+    ]:[];
 
     return (
         <div className="relative w-full overflow-clip">
-            <Timeline data={data} tripData={TRIP_DATA} />
+            {tripData && <Timeline data={data} tripData={tripData} />}
             <HotelCard selectedHotel={selectedHotel} setSelectedHotel={setSelectedHotel} />
             <ActivityCard selectedActivity={selectedActivity} setSelectedActivity={setSelectedActivity} />
         </div>

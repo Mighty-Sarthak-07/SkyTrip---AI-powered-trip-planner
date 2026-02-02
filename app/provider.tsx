@@ -1,4 +1,5 @@
 "use client"
+import { TripContextType, TripDetailContext } from '@/context/TripDetailContext';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { api } from '@/convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
@@ -6,6 +7,7 @@ import { useMutation } from 'convex/react';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Footer from './_components/footer';
 import Header from './_components/header';
+import { TripInfo } from './create-new-trip/_component/chatbox';
 const Provider = ({
   children,
 }: Readonly<{
@@ -13,7 +15,7 @@ const Provider = ({
 }>) => {
 
   const createUser = useMutation(api.user.CreateNewUser);
-  const [userDetail, setUserDetail] = useState<any>(null); 
+  const [userDetail, setUserDetail] = useState<any>(null);
   const { user } = useUser();
 
   const CreateNewUser = useCallback(async () => {
@@ -31,15 +33,17 @@ const Provider = ({
     user && CreateNewUser();
   }, [user, CreateNewUser]);
 
-
+  const [tripDetailInfo, setTripDetailInfo] = useState<TripInfo | null>(null);
 
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-      <div>
-        <Header />
-        {children}
-        <Footer />
-      </div>
+      <TripDetailContext.Provider value={{ tripDetailInfo, setTripDetailInfo }}>
+        <div>
+          <Header />
+          {children}
+          <Footer />
+        </div>
+      </TripDetailContext.Provider>
     </UserDetailContext.Provider>
   )
 }
@@ -50,6 +54,14 @@ export const useUserDetail = () => {
   const context = useContext(UserDetailContext);
   if (!context) {
     throw new Error('useUserDetail must be used within a UserDetailProvider');
+  }
+  return context;
+};
+
+export const useTripDetail = (): TripContextType => {
+  const context = useContext(TripDetailContext);
+  if (!context) {
+    throw new Error('useTripDetail must be used within a TripDetailProvider');
   }
   return context;
 };

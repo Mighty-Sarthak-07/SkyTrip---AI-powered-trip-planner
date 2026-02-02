@@ -1,5 +1,5 @@
 "use client"
-import { useUserDetail } from '@/app/provider'
+import { useTripDetail, useUserDetail } from '@/app/provider'
 import { api } from '@/convex/_generated/api'
 import axios from 'axios'
 import { useMutation } from 'convex/react'
@@ -70,6 +70,7 @@ const Chatbox = () => {
     const [tripDetail, setTripDetail] = useState<TripInfo>();
     const { userDetail, setUserDetail } = useUserDetail();
     const SaveTripDetail = useMutation(api.tripDetail.createTripDetail);
+    const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
 
     const onSend = async (input?: string) => {
         const msgContent = input || userInput;
@@ -91,6 +92,7 @@ const Chatbox = () => {
         }]);
         if (isFinal && result?.data && userDetail?._id) {
             setTripDetail(result?.data);
+            setTripDetailInfo(result?.data);
             const tripId = uuidv4();
             await SaveTripDetail({
                 tripDetail: result?.data,
@@ -131,7 +133,7 @@ const Chatbox = () => {
         }
     }, [isFinal])
     return (
-        <div className='h-[84vh] flex flex-col'>
+        <div className='h-[84vh] w-full flex flex-col'>
             {messages?.length == 0 && <EmptyBoxState onSelectOption={(v: string) => onSend(v)} />}
             <section className='flex-1 overflow-y-auto p-4'>
                 <div className="flex flex-col gap-2">
