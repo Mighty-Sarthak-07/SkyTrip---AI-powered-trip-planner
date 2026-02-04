@@ -38,7 +38,7 @@ const EmptyBoxState = ({ onSelectOption }: any) => {
             <div className='flex items-center gap-2 mb-6'>
                 <Globe className='w-12 h-12 text-primary animate-pulse' />
             </div>
-            <h2 className='text-4xl font-extrabold text-gray-900 tracking-tight'>
+            <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
                 Start Planning your <span className='text-primary'>Next Trip</span>
             </h2>
             <p className='text-gray-500 text-center mt-4 max-w-xl text-lg relative z-10'>

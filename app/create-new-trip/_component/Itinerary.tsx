@@ -1,14 +1,14 @@
 
 "use client";
+import { useTripDetail } from "@/app/provider";
 import { Timeline } from "@/components/ui/timeline";
 import axios from "axios";
-import { Clock, ExternalLink, MapPin, Star, Ticket, Wallet } from "lucide-react";
+import { ArrowLeft, Clock, ExternalLink, MapPin, Star, Ticket, Wallet } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ActivityCard from "./ActivityCard";
-import HotelCard from "./HotelCard";
-import { useTripDetail } from "@/app/provider";
 import { TripInfo } from "./chatbox";
+import HotelCard from "./HotelCard";
 
 // const TRIP_DATA = {
 //     budget: "Low",
@@ -242,7 +242,7 @@ const HotelGridItem = ({ hotel, index, setSelectedHotel }: { hotel: any, index: 
             </div>
 
             <div className="flex justify-between items-center mt-auto">
-               <Wallet className="w-5 h-5 text-green-600" /> <p className="text-green-600 font-bold text-lg">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
+                <Wallet className="w-5 h-5 text-green-600" /> <p className="text-green-600 font-bold text-lg">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
                 <button
                     onClick={() => setSelectedHotel(hotel)}
                     className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
@@ -325,8 +325,8 @@ const ActivityGridItem = ({ activity, index, setSelectedActivity }: { activity: 
 
 const Itinerary = () => {
     //ts-ignore
-     const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
-     const [tripData,setTripData] = useState<TripInfo | null>(null);
+    const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
+    const [tripData, setTripData] = useState<TripInfo | null>(null);
     const [selectedHotel, setSelectedHotel] = React.useState<any>(null);
     const [selectedActivity, setSelectedActivity] = React.useState<any>(null);
 
@@ -334,47 +334,72 @@ const Itinerary = () => {
         tripDetailInfo && setTripData(tripDetailInfo);
     }, [tripDetailInfo]);
 
-    const data = tripData?[{
-            title: "Recommended Hotels",
-            content: (
+    const data = tripData ? [{
+        title: "Recommended Hotels",
+        content: (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {tripData?.hotels.map((hotel, index) => (
+                    <HotelGridItem key={index} hotel={hotel} index={index} setSelectedHotel={setSelectedHotel} />
+                ))}
+            </div>
+        ),
+    },
+    ...tripData?.itinerary?.map((dayData) => ({
+        title: `Day ${dayData.day}`,
+        content: (
+            <div className="flex flex-col gap-6">
+                <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/50 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div className="flex items-center gap-3 mb-2">
+                        <span className="bg-orange-100 dark:bg-orange-800 text-orange-700 dark:text-orange-200 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                            <Clock className="w-3 h-3" /> Best Time
+                        </span>
+                        <span className="text-orange-900 dark:text-orange-100 font-semibold tracking-wide">
+                            {dayData.best_time_to_visit_day}
+                        </span>
+                    </div>
+                    <p className="text-neutral-700 dark:text-neutral-300 text-lg leading-relaxed font-medium">
+                        {dayData.day_plan}
+                    </p>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {tripData?.hotels.map((hotel, index) => (
-                        <HotelGridItem key={index} hotel={hotel} index={index} setSelectedHotel={setSelectedHotel} />
+                    {dayData?.activities.map((activity, index) => (
+                        <ActivityGridItem key={index} activity={activity} index={index} setSelectedActivity={setSelectedActivity} />
                     ))}
                 </div>
-            ),
-        },
-        ...tripData?.itinerary?.map((dayData) => ({
-            title: `Day ${dayData.day}`,
-            content: (
-                <div className="flex flex-col gap-6">
-                    <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/50 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <div className="flex items-center gap-3 mb-2">
-                            <span className="bg-orange-100 dark:bg-orange-800 text-orange-700 dark:text-orange-200 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1">
-                                <Clock className="w-3 h-3" /> Best Time
-                            </span>
-                            <span className="text-orange-900 dark:text-orange-100 font-semibold tracking-wide">
-                                {dayData.best_time_to_visit_day}
-                            </span>
-                        </div>
-                        <p className="text-neutral-700 dark:text-neutral-300 text-lg leading-relaxed font-medium">
-                            {dayData.day_plan}
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {dayData?.activities.map((activity, index) => (
-                            <ActivityGridItem key={index} activity={activity} index={index} setSelectedActivity={setSelectedActivity} />
-                        ))}
-                    </div>
-                </div>
-            ),
-        }))
-    ]:[];
+            </div>
+        ),
+    }))
+    ] : [];
 
     return (
         <div className="relative w-full overflow-clip">
-            {tripData && <Timeline data={data} tripData={tripData} />}
+            {tripData ? (
+                <Timeline data={data} tripData={tripData} />
+            ) : (
+                <div className="relative h-[80vh] w-full rounded-2xl overflow-hidden shadow-2xl group">
+                    <Image
+                        src="/empty.jpg"
+                        alt="Start Planning"
+                        fill
+                        className="object-cover w-full h-full transition-transform duration-1000 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                    <div className="absolute bottom-12 left-0 w-full px-6 flex flex-col items-center text-center space-y-4">
+                        <div className="p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-full shadow-lg animate-pulse">
+                            <ArrowLeft className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-4xl font-bold text-white tracking-tight drop-shadow-2xl">
+                                Make your personalized trip
+                            </h2>
+                            <p className="text-lg text-neutral-200 font-medium drop-shadow-md">
+                                Here with the help of SkyTrip
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
             <HotelCard selectedHotel={selectedHotel} setSelectedHotel={setSelectedHotel} />
             <ActivityCard selectedActivity={selectedActivity} setSelectedActivity={setSelectedActivity} />
         </div>

@@ -1,6 +1,7 @@
+import aj from "@/lib/arcjet";
+import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { OpenAI } from "openai";
-
 const PROMPT = `You are an expert AI Travel Consultant. Your goal is to plan a personalized itinerary for the user.
 Follow this strict conversation flow to gather necessary details. ASK ONLY ONE QUESTION AT A TIME. Wait for the user's response before proceeding to the next step.
 
@@ -76,42 +77,49 @@ Output Schema:
 
 
 export async function POST(req: NextRequest) {
-    const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENROUTER_API;
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENROUTER_API;
 
-    if (!apiKey) {
-        return NextResponse.json({ error: "OPENROUTER_API_KEY or OPENROUTER_API is missing in environment variables." }, { status: 500 });
+  if (!apiKey) {
+    return NextResponse.json({ error: "OPENROUTER_API_KEY or OPENROUTER_API is missing in environment variables." }, { status: 500 });
+  }
+
+  try {
+    const { messages, isFinal } = await req.json();
+    const user = await currentUser();
+    const userId = user?.primaryEmailAddress?.emailAddress;
+    const decision = await aj.protect(req, { userId: userId??"", requested: isFinal?5:0 });
+    //@ts-ignore
+    if(decision?.reason?.remaining==0){
+      return NextResponse.json({ resp: "No Free Credits Left", ui: "limit" });
     }
 
-    try {
-        const { messages, isFinal } = await req.json();
+    const openai = new OpenAI({
+      baseURL: "https://openrouter.ai/api/v1",
+      apiKey: apiKey
+    });
 
-        const openai = new OpenAI({
-            baseURL: "https://openrouter.ai/api/v1",
-            apiKey: apiKey
-        });
+    const completion = await openai.chat.completions.create({
+      model: "openai/gpt-4o-mini",
+      response_format: { type: 'json_object' },
+      messages: [
+        {
+          "role": "system",
+          "content": isFinal ? FINAL_PROMPT : PROMPT
+        },
+        ...messages
+      ]
+    });
 
-        const completion = await openai.chat.completions.create({
-            model: "openai/gpt-4o-mini",
-            response_format: { type: 'json_object' },
-            messages: [
-                {
-                    "role": "system",
-                    "content": isFinal ? FINAL_PROMPT : PROMPT
-                },
-                ...messages
-            ]
-        });
+    console.log(completion.choices[0].message);
+    const message = completion.choices[0].message;
 
-        console.log(completion.choices[0].message);
-        const message = completion.choices[0].message;
-
-        return NextResponse.json(JSON.parse(message.content ?? ""));
-    }
-    catch (error: any) {
-        console.error("Error in POST requestDetails:", error);
-        return NextResponse.json({
-            error: error.message || "Internal Server Error",
-            details: error.response?.data || "No additional details"
-        }, { status: 500 });
-    }
+    return NextResponse.json(JSON.parse(message.content ?? ""));
+  }
+  catch (error: any) {
+    console.error("Error in POST requestDetails:", error);
+    return NextResponse.json({
+      error: error.message || "Internal Server Error",
+      details: error.response?.data || "No additional details"
+    }, { status: 500 });
+  }
 }
