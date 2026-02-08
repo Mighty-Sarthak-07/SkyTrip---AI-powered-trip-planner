@@ -14,7 +14,7 @@ const Hero = () => {
       router.push('/sign-in');
       return;
     }
-    router.push('/trip');
+    router.push('/my-trips');
 
   }
   const [inputValue, setInputValue] = useState('')
@@ -59,7 +59,7 @@ const Hero = () => {
         <div className='text-center space-y-4'>
           <h1 className='text-5xl md:text-6xl font-bold text-gray-800 py-12'>
             Hey, I'm your personal{' '}
-            <span className='text-primary'>trip planner</span>
+            <span className='text-primary'>Trip Planner</span>
           </h1>
           <p className='text-lg md:text-xl text-gray-500 max-w-2xl mx-auto'>
             Tell me what you want, and I'll handle the rest: flights, hotels, itineraries — all in seconds.

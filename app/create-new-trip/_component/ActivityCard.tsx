@@ -39,7 +39,7 @@ const ActivityCard = ({ selectedActivity, setSelectedActivity }: ActivityCardPro
                     >
                         <div className="relative h-64 w-full">
                             <Image
-                                src={photoUrl? photoUrl : '/placeholder.png'}
+                                src={photoUrl? photoUrl : '/activities.png'}
                                 alt={selectedActivity.place_name}
                                 fill
                                 className="object-cover"

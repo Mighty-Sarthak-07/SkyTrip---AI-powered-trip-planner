@@ -1,7 +1,8 @@
 import aj from "@/lib/arcjet";
-import { currentUser } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { OpenAI } from "openai";
+
 const PROMPT = `You are an expert AI Travel Consultant. Your goal is to plan a personalized itinerary for the user.
 Follow this strict conversation flow to gather necessary details. ASK ONLY ONE QUESTION AT A TIME. Wait for the user's response before proceeding to the next step.
 
@@ -88,11 +89,16 @@ export async function POST(req: NextRequest) {
     const user = await currentUser();
     const userId = user?.primaryEmailAddress?.emailAddress;
     const decision = await aj.protect(req, { userId: userId??"", requested: isFinal?5:0 });
+    const {has} = await auth();
+    const hasPremiumAccess = has({ plan: 'monthly' });
+    console.log(hasPremiumAccess);
     //@ts-ignore
-    if(decision?.reason?.remaining==0){
+    if(decision?.reason?.remaining==0 && hasPremiumAccess){
       return NextResponse.json({ resp: "No Free Credits Left", ui: "limit" });
     }
-
+    if(!hasPremiumAccess){
+      return NextResponse.json({ resp: "No Premium Access", ui: "limit" });
+    }
     const openai = new OpenAI({
       baseURL: "https://openrouter.ai/api/v1",
       apiKey: apiKey

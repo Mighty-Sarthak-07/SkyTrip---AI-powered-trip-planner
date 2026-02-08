@@ -4,6 +4,7 @@ import { SignInButton, UserButton, useUser } from '@clerk/nextjs'
 import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 const menuOptions = [
@@ -28,6 +29,7 @@ const menuOptions = [
 const Header = () => {
     const { user, isSignedIn } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const path = usePathname();
 
     return (
         <header className='p-4 shadow-sm bg-white sticky top-0 z-50 border-b border-gray-100'>
@@ -55,9 +57,15 @@ const Header = () => {
                 <div className='hidden md:flex items-center gap-4'>
                     {isSignedIn ? (
                         <div className='flex gap-2 items-center'>
-                            <Link href="/create-new-trip">
-                                <ShimmerButton className='h-10 px-6 text-sm font-medium'>Create New Trip</ShimmerButton>
-                            </Link>
+                            {path === '/create-new-trip' ? (
+                                <Link href="/my-trips">
+                                    <ShimmerButton className='h-10 px-6 text-sm font-medium'>My Trips</ShimmerButton>
+                                </Link>
+                            ) : (
+                                <Link href="/create-new-trip">
+                                    <ShimmerButton className='h-10 px-6 text-sm font-medium'>Create New Trip</ShimmerButton>
+                                </Link>
+                            )}
                             <UserButton appearance={{
                                 elements: {
                                     userButtonAvatarBox: "h-14 w-14 border-2 border-primary/10 rounded-full"
@@ -111,9 +119,15 @@ const Header = () => {
                         </div>
                     ) : (
                         <div className="pt-2">
-                            <Link href="/create-new-trip" onClick={() => setIsMenuOpen(false)}>
-                                <ShimmerButton className='w-full justify-center'>Create New Trip</ShimmerButton>
-                            </Link>
+                            {path === '/create-new-trip' ? (
+                                <Link href="/my-trips" onClick={() => setIsMenuOpen(false)}>
+                                    <ShimmerButton className='w-full justify-center'>My Trips</ShimmerButton>
+                                </Link>
+                            ) : (
+                                <Link href="/create-new-trip" onClick={() => setIsMenuOpen(false)}>
+                                    <ShimmerButton className='w-full justify-center'>Create New Trip</ShimmerButton>
+                                </Link>
+                            )}
                         </div>
                     )}
                 </div>

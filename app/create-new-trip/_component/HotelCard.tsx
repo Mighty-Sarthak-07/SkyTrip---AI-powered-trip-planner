@@ -40,7 +40,7 @@ const HotelCard = ({ selectedHotel, setSelectedHotel }: HotelCardProps) => {
                     >
                         <div className="relative h-64 w-full">
                             <Image
-                                src={photoUrl ? photoUrl : '/placeholder.png'}
+                                src={photoUrl ? photoUrl : '/Hotel.png'}
                                 alt={selectedHotel.hotel_name}
                                 fill
                                 className="object-cover"

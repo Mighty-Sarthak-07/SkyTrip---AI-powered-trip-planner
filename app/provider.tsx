@@ -5,7 +5,7 @@ import { api } from '@/convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
 import { useMutation } from 'convex/react';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import Footer from './_components/footer';
+
 import Header from './_components/header';
 import { TripInfo } from './create-new-trip/_component/chatbox';
 const Provider = ({
@@ -41,7 +41,6 @@ const Provider = ({
         <div>
           <Header />
           {children}
-          <Footer />
         </div>
       </TripDetailContext.Provider>
     </UserDetailContext.Provider>

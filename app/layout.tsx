@@ -1,13 +1,11 @@
-import type { Metadata } from "next";
-import { Fugaz_One } from "next/font/google";
-import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import type { Metadata } from "next";
+import { Outfit } from "next/font/google";
 import { ConvexClientProvider } from "./ConvexClientProvider";
+import "./globals.css";
 
-const fugazOne = Fugaz_One({
-  variable: "--font-fugaz-one",
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -22,15 +20,15 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={fugazOne.className}
-      >
-        <ConvexClientProvider>
-          {children}
-        </ConvexClientProvider>
-      </body>
-    </html>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={outfit.className}
+        >
+          <ConvexClientProvider>
+            {children}
+          </ConvexClientProvider>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }

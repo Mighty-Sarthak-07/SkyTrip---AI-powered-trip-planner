@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, Carousel } from "@/components/ui/apple-cards-carousel";
+import Footer from "./footer";
 
 export function PopularCityList() {
   const cards = data.map((card, index) => (
@@ -19,7 +20,7 @@ export function PopularCityList() {
 
 const DummyContent = () => {
   return (
-    <>
+    <div>
       {[...new Array(3).fill(1)].map((_, index) => {
         return (
           <div
@@ -44,8 +45,8 @@ const DummyContent = () => {
             />
           </div>
         );
-      })}
-    </>
+      })}   
+    </div>
   );
 };
 

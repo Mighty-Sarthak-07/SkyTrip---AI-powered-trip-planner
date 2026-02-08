@@ -222,7 +222,7 @@ const HotelGridItem = ({ hotel, index, setSelectedHotel }: { hotel: any, index: 
         <div key={index} className="group bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300">
             <div className="relative overflow-hidden rounded-xl aspect-[4/3] mb-4">
                 <Image
-                    src={photoUrl ? photoUrl : '/placeholder.png'}
+                    src={photoUrl ? photoUrl : '/Hotel.png'}
                     alt={hotel.hotel_name}
                     width={400}
                     height={300}
@@ -277,7 +277,7 @@ const ActivityGridItem = ({ activity, index, setSelectedActivity }: { activity: 
         >
             <div className="relative overflow-hidden rounded-xl aspect-[16/10] mb-4">
                 <Image
-                    src={photoUrl ? photoUrl : '/placeholder.png'}
+                    src={photoUrl ? photoUrl : '/activities.png'}
                     alt={activity.place_name}
                     width={400}
                     height={200}
@@ -338,13 +338,13 @@ const Itinerary = () => {
         title: "Recommended Hotels",
         content: (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {tripData?.hotels.map((hotel, index) => (
+                {tripData?.hotels?.map((hotel, index) => (
                     <HotelGridItem key={index} hotel={hotel} index={index} setSelectedHotel={setSelectedHotel} />
                 ))}
             </div>
         ),
     },
-    ...tripData?.itinerary?.map((dayData) => ({
+    ...(tripData?.itinerary?.map((dayData) => ({
         title: `Day ${dayData.day}`,
         content: (
             <div className="flex flex-col gap-6">
@@ -363,13 +363,13 @@ const Itinerary = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {dayData?.activities.map((activity, index) => (
+                    {dayData?.activities?.map((activity, index) => (
                         <ActivityGridItem key={index} activity={activity} index={index} setSelectedActivity={setSelectedActivity} />
                     ))}
                 </div>
             </div>
         ),
-    }))
+    })) || [])
     ] : [];
 
     return (
