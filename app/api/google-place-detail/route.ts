@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         }, config);
 
         const placesRefName = result?.data?.places[0]?.photos[0]?.name;
-        const placesRefURL= `https://places.googleapis.com/v1/${placesRefName}/media?maxHeightPx=1000&maxWidthPx=1000&key=${process.env.GOOGLE_PLACES_API_KEY}`
+        const placesRefURL = `https://places.googleapis.com/v1/${placesRefName}/media?maxHeightPx=1000&maxWidthPx=1000&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`
 
         return NextResponse.json(placesRefURL);
     }

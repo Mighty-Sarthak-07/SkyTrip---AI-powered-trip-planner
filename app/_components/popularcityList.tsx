@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, Carousel } from "@/components/ui/apple-cards-carousel";
-import Footer from "./footer";
+import { motion } from "motion/react";
 
 export function PopularCityList() {
   const cards = data.map((card, index) => (
@@ -9,11 +9,24 @@ export function PopularCityList() {
   ));
 
   return (
-    <div className="w-full h-full py-20">
-      <h2 className="max-w-7xl pl-4 mx-auto text-xl md:text-5xl font-bold text-neutral-800 dark:text-neutral-200 font-sans">
-      Popular Cities to visit
-      </h2>
-      <Carousel items={cards} />
+    <div className="w-full h-full py-20 bg-neutral-50 dark:bg-neutral-900 transition-colors duration-500">
+      <motion.h2
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true }}
+        className="max-w-7xl pl-4 mx-auto text-xl md:text-5xl font-bold text-neutral-800 dark:text-neutral-200 font-sans mb-8"
+      >
+        Popular Cities to visit
+      </motion.h2>
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+        viewport={{ once: true }}
+      >
+        <Carousel items={cards} />
+      </motion.div>
     </div>
   );
 }
@@ -45,7 +58,7 @@ const DummyContent = () => {
             />
           </div>
         );
-      })}   
+      })}
     </div>
   );
 };
