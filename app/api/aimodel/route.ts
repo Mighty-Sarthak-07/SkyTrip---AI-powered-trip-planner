@@ -78,7 +78,7 @@ Output Schema:
 
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENROUTER_API;
+  const apiKey = process.env.OPENROUTER_API;
 
   if (!apiKey) {
     return NextResponse.json({ error: "OPENROUTER_API_KEY or OPENROUTER_API is missing in environment variables." }, { status: 500 });
@@ -88,16 +88,13 @@ export async function POST(req: NextRequest) {
     const { messages, isFinal } = await req.json();
     const user = await currentUser();
     const userId = user?.primaryEmailAddress?.emailAddress;
-    const decision = await aj.protect(req, { userId: userId??"", requested: isFinal?5:0 });
-    const {has} = await auth();
+    const decision = await aj.protect(req, { userId: userId ?? "", requested: isFinal ? 5 : 0 });
+    const { has } = await auth();
     const hasPremiumAccess = has({ plan: 'monthly' });
-    console.log(hasPremiumAccess);
-    //@ts-ignore
-    if(decision?.reason?.remaining==0 && hasPremiumAccess){
+
+    // @ts-ignore
+    if (!hasPremiumAccess && (decision.isDenied() || (decision.reason && decision.reason.remaining <= 0))) {
       return NextResponse.json({ resp: "No Free Credits Left", ui: "limit" });
-    }
-    if(!hasPremiumAccess){
-      return NextResponse.json({ resp: "No Premium Access", ui: "limit" });
     }
     const openai = new OpenAI({
       baseURL: "https://openrouter.ai/api/v1",
@@ -116,7 +113,6 @@ export async function POST(req: NextRequest) {
       ]
     });
 
-    console.log(completion.choices[0].message);
     const message = completion.choices[0].message;
 
     return NextResponse.json(JSON.parse(message.content ?? ""));

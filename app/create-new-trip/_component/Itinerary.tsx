@@ -1,16 +1,15 @@
 
 "use client";
 import { useTripDetail } from "@/app/provider";
-import { Globe } from "@/components/ui/globe";
 import { Timeline } from "@/components/ui/timeline";
 import axios from "axios";
-import { ArrowDownNarrowWideIcon, ArrowLeft, Clock, ExternalLink, MapPin, Star, Ticket, Wallet } from "lucide-react";
+import {ArrowLeft, Clock, ExternalLink, MapPin, Star, Ticket, Wallet } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ActivityCard from "./ActivityCard";
 import { TripInfo } from "./chatbox";
-import GlobalMap from "./GlobalMap";
 import HotelCard from "./HotelCard";
+import { ShareExport } from "./TripTools";
 
 // const TRIP_DATA = {
 //     budget: "Low",
@@ -222,7 +221,7 @@ const HotelGridItem = ({ hotel, index, setSelectedHotel }: { hotel: any, index: 
 
     return (
         <div key={index} className="group bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300">
-            
+
             <div className="relative overflow-hidden rounded-xl aspect-[4/3] mb-4">
                 <Image
                     src={photoUrl ? photoUrl : '/Hotel.png'}
@@ -326,7 +325,7 @@ const ActivityGridItem = ({ activity, index, setSelectedActivity }: { activity: 
     )
 }
 
-const Itinerary = () => {
+const Itinerary = ({ trip }: { trip?: TripInfo }) => {
     //ts-ignore
     const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
     const [tripData, setTripData] = useState<TripInfo | null>(null);
@@ -334,8 +333,9 @@ const Itinerary = () => {
     const [selectedActivity, setSelectedActivity] = React.useState<any>(null);
 
     useEffect(() => {
-        tripDetailInfo && setTripData(tripDetailInfo);
-    }, [tripDetailInfo]);
+        trip && setTripData(trip);
+        !trip && tripDetailInfo && setTripData(tripDetailInfo);
+    }, [trip, tripDetailInfo]);
 
     const data = tripData ? [{
         title: "Recommended Hotels",
@@ -407,27 +407,12 @@ const Itinerary = () => {
                 <div className="bg-white dark:bg-black/20 backdrop-blur-xl border border-neutral-200 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 opacity-50" />
 
-                    <div className="relative z-10 flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-100 dark:bg-blue-500/20 rounded-2xl shadow-sm">
-                                <MapPin className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-bold text-neutral-800 dark:text-white tracking-tight">Interactive Trip Map</h1>
-                                <p className="text-neutral-500 dark:text-neutral-400 text-sm font-medium">Explore all your planned destinations</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full border border-neutral-200 dark:border-neutral-700">
-                            <ArrowDownNarrowWideIcon className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
-                            <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">Overview</span>
-                        </div>
-                    </div>
-
-                    <div className="relative z-10 w-full h-[500px] rounded-2xl overflow-hidden border border-neutral-200 dark:border-white/10 shadow-inner">
-                        <GlobalMap trip={tripData} />
-                    </div>
                 </div>
             </div>
+
+
+            <ShareExport trip={tripData || undefined} />
+
             <HotelCard selectedHotel={selectedHotel} setSelectedHotel={setSelectedHotel} />
             <ActivityCard selectedActivity={selectedActivity} setSelectedActivity={setSelectedActivity} />
         </div>
