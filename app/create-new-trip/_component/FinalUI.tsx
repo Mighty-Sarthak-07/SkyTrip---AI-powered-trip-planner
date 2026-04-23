@@ -2,15 +2,20 @@
 import { Button } from '@/components/ui/button';
 import { Globe, Plane } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const FinalUI = ({ viewTrip,disable }: any) => {
+const FinalUI = ({ disable }: any) => {
     const [clicked, setClicked] = useState(false);
 
+    const router = useRouter();
+
     const handleClick = () => {
-        if (clicked) return;
+        if (clicked) {
+            return;
+        }
         setClicked(true);
-        viewTrip();
+        router.push('/my-trips');
     };
 
     return (
