@@ -30,6 +30,7 @@ Follow this strict conversation flow to gather necessary details. ASK ONLY ONE Q
 const FINAL_PROMPT = `Generate Travel Plan with give details, give me Hotels options list with HotelName,
 Hotel address, Price in INR or USD if outside country, hotel image url, geo coordinates, rating, descriptions and suggest itinerary with PlaceName, Place Details, Place Image Url,
 Geo Coordinates, Place address, ticket Pricing in INR or USD if outside country, Time travel each of the location , with each day plan with best time to visit in JSON format.
+IMPORTANT: Only suggest hotels that are available and bookable on MakeMyTrip (makemytrip.com). Prefer well-known hotel chains, resorts, and properties that are listed on MakeMyTrip. Avoid suggesting obscure or unlisted properties.
 Output Schema:
 
 { "origin": "string",

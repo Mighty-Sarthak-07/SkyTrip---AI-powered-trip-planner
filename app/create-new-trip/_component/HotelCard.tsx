@@ -5,6 +5,8 @@ import { ExternalLink, MapPin, Star, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+
 interface HotelCardProps {
     selectedHotel: any;
     setSelectedHotel: (hotel: any) => void;
@@ -25,6 +27,20 @@ const HotelCard = ({ selectedHotel, setSelectedHotel }: HotelCardProps) => {
         } catch (error: any) {
             console.error("Failed to fetch hotel details:", error);
         }
+    }
+
+    const extractCity = (address: string): string => {
+        const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Bengaluru', 'Srinagar', 'Jaipur', 'Goa', 'Agra', 'Chennai', 'Hyderabad', 'Kolkata', 'Pune']
+        for (const city of cities) {
+            if (address.includes(city)) return city
+        }
+        return 'Mumbai'
+    }
+
+    const handleBookNow = (hotel: any) => {
+        const city = extractCity(hotel.hotel_address)
+        const url = `https://www.makemytrip.com/hotels/${city.toLowerCase()}-hotels.html`
+        window.open(url, '_blank')
     }
 
     return (
@@ -95,6 +111,12 @@ const HotelCard = ({ selectedHotel, setSelectedHotel }: HotelCardProps) => {
                                 </p>
                             </div>
                             <Link href={'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(selectedHotel?.hotel_name + "," + selectedHotel?.hotel_address)} target="_blank"><button className="bg-primary dark:bg-white text-white dark:text-black px-5 py-2 mt-4 rounded-lg text-sm font-medium hover:opacity-80 transition-opacity w-full flex items-center justify-center gap-2">View on Map <ExternalLink /></button></Link>
+                            <button
+                                onClick={() => handleBookNow(selectedHotel)}
+                                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg mt-2 transition-colors"
+                            >
+                                Book Now on MakeMyTrip
+                            </button>
                         </div>
                     </div>
                 </div>

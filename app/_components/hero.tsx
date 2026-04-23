@@ -27,7 +27,8 @@ const Hero = () => {
       iconColor: 'text-blue-600',
       bgColor: 'bg-blue-100',
       hoverBgColor: 'group-hover:bg-blue-200',
-      badge: { type: 'text', content: '+', className: 'absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold' }
+      badge: { type: 'text', content: '+', className: 'absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold' },
+      href: '/create-new-trip',
     },
     {
       label: 'Inspire me where to Go',
@@ -35,7 +36,8 @@ const Hero = () => {
       iconColor: 'text-green-600',
       bgColor: 'bg-green-100',
       hoverBgColor: 'group-hover:bg-green-200',
-      badge: { type: 'icon', icon: Sparkles, className: 'w-3 h-3 text-green-600 absolute -top-0.5 -right-0.5' }
+      badge: { type: 'icon', icon: Sparkles, className: 'w-3 h-3 text-green-600 absolute -top-0.5 -right-0.5' },
+      href: '/inspire',
     },
     {
       label: 'Discover Hidden Gems',
@@ -43,6 +45,7 @@ const Hero = () => {
       iconColor: 'text-pink-600',
       bgColor: 'bg-pink-100',
       hoverBgColor: 'group-hover:bg-pink-200',
+      href: '/hidden-gems',
     },
     {
       label: 'Adventure Destinations',
@@ -50,6 +53,7 @@ const Hero = () => {
       iconColor: 'text-green-600',
       bgColor: 'bg-green-100',
       hoverBgColor: 'group-hover:bg-green-200',
+      href: '/adventure',
     },
   ]
 
@@ -117,6 +121,7 @@ const Hero = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: delay }}
                 whileHover={{ scale: 1.05, y: -5 }}
+                onClick={() => router.push(action.href ?? '/')}
                 className='flex flex-col items-center cursor-pointer gap-2 p-4 rounded-xl hover:bg-gray-50 transition-colors group'
               >
                 <div className={`w-12 h-12 rounded-full ${action.bgColor} flex items-center  justify-center ${action.hoverBgColor} transition-colors ${action.badge ? 'relative' : ''}`}>
