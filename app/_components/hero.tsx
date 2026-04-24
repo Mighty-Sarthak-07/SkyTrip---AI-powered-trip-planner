@@ -161,7 +161,7 @@ const Hero = () => {
           className="block dark:hidden mt-8"
           animationStyle="from-center"
           videoSrc="https://www.example.com/dummy-video"
-          thumbnailSrc="https://media.licdn.com/dms/image/v2/D5612AQE-YXa0pSRzvA/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1735040179159?e=2147483647&v=beta&t=ADbWWhJWdO-nyIyW4K9icC58S3ouzpKATgHXfL9YpbM"
+          thumbnailSrc="/thumbnail2.png"
           thumbnailAlt="Dummy Video Thumbnail"
         />
       </div>
