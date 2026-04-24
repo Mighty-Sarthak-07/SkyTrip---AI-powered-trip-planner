@@ -237,7 +237,7 @@ export default function AboutPage() {
                   <Github className="w-4 h-4" /> GitHub
                 </a>
                 <a
-                  href="https://linkedin.com/in/sarthak-kesarwani"
+                  href="https://www.linkedin.com/in/sarthak-kesarwani-48b4702a7/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 bg-blue-600/80 hover:bg-blue-600 border border-blue-500/30 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-105"
@@ -245,7 +245,7 @@ export default function AboutPage() {
                   <Linkedin className="w-4 h-4" /> LinkedIn
                 </a>
                 <a
-                  href="https://twitter.com/SarthakKesarwani"
+                  href="https://x.com/Lord_Sarthak01"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 bg-sky-500/80 hover:bg-sky-500 border border-sky-400/30 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-105"
@@ -253,7 +253,7 @@ export default function AboutPage() {
                   <Twitter className="w-4 h-4" /> Twitter
                 </a>
                 <a
-                  href="https://instagram.com/sarthak.kesarwani"
+                  href="https://www.instagram.com/savage_sarthak_07?igsh=MTBtbWlzd2Z1emU0cg=="
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 bg-pink-600/80 hover:bg-pink-600 border border-pink-500/30 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-105"
