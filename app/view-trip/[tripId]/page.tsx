@@ -6,8 +6,9 @@ import TripChatbot from '@/app/create-new-trip/_component/TripChatbot'
 import PrintTravelGuide from '@/app/create-new-trip/_component/PrintTravelGuide'
 import { useTripDetail, useUserDetail } from '@/app/provider'
 import { api } from '@/convex/_generated/api'
-import { useConvex } from 'convex/react'
-import { ArrowLeft } from 'lucide-react'
+import { useConvex, useMutation } from 'convex/react'
+import { ArrowLeft, Check, CheckCircle, X, Star } from 'lucide-react'
+import { toast } from 'sonner'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -16,9 +17,19 @@ const ViewTrip = () => {
   console.log(tripId);
   const { userDetail, setUserDetail } = useUserDetail();
   const convex = useConvex();
+  const completeTrip = useMutation(api.tripDetail.completeTripDetail);
 
   const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
   const [activeDay, setActiveDay] = useState<number | null>(null);
+
+  // Feedback Modal State
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [rating, setRating] = useState<number>(0);
+  const [platformHelp, setPlatformHelp] = useState<string>('');
+  const [usedPdfQr, setUsedPdfQr] = useState<string>('');
+  const [feedbackNotes, setFeedbackNotes] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tripDetailRecord, setTripDetailRecord] = useState<any | null>(null);
 
   useEffect(() => {
     userDetail && GetTripDetail();
@@ -31,7 +42,40 @@ const ViewTrip = () => {
     });
     console.log(result);
     setTripDetailInfo(result?.tripDetail);
+    setTripDetailRecord(result);
   }
+
+  const handleSubmitFeedback = async (isSkipped = false) => {
+    if (!userDetail || !tripDetailRecord) return;
+    setIsSubmitting(true);
+
+    const feedbackData = isSkipped ? null : {
+      rating,
+      platformHelp,
+      usedPdfQr,
+      feedbackNotes
+    };
+
+    try {
+      await completeTrip({
+        tripId: tripId + "",
+        uid: userDetail._id,
+        feedback: feedbackData
+      });
+      setTripDetailRecord((prev: any) => ({
+        ...prev,
+        completed: true,
+        feedback: feedbackData
+      }));
+      setShowCompleteModal(false);
+      toast.success("Trip marked as completed! 🎉");
+    } catch (err) {
+      console.error("Failed to complete trip:", err);
+      toast.error("Failed to mark trip as completed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -43,14 +87,33 @@ const ViewTrip = () => {
           <div className="w-full md:col-span-2">
             <div className="sticky top-20">
               <h1 className="px-2 text-4xl py-5">Interactive Trip Map</h1>
-              <div 
-                onClick={() => setActiveDay(null)}
-                className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full border border-neutral-200 dark:border-neutral-700 mb-4 w-fit cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all duration-200"
-                title="Reset to overview"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
-                <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">Overview</span>
+              
+              <div className="flex items-center gap-3 mb-4">
+                <div 
+                  onClick={() => setActiveDay(null)}
+                  className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full border border-neutral-200 dark:border-neutral-700 w-fit cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all duration-200"
+                  title="Reset to overview"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
+                  <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">Overview</span>
+                </div>
+                
+                {tripDetailRecord?.completed ? (
+                  <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 rounded-full border border-emerald-100 dark:border-emerald-900/30 font-bold text-xs shadow-sm">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-450" />
+                    <span>Trip Completed</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowCompleteModal(true)}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-xs cursor-pointer transition-all duration-200 shadow-md shadow-emerald-500/10 hover:shadow-lg"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Trip Completed?</span>
+                  </button>
+                )}
               </div>
+
               <GlobalMap trip={tripDetailInfo} activeDay={activeDay} />
               <div className="mt-6">
                 <PackingList trip={tripDetailInfo || undefined} />
@@ -60,6 +123,127 @@ const ViewTrip = () => {
         </div>
         {tripDetailInfo && <TripChatbot tripContext={tripDetailInfo} />}
       </div>
+
+      {showCompleteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 md:p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setShowCompleteModal(false)}
+              className="absolute top-4 right-4 p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-neutral-950 dark:text-white tracking-tight">Trip Completed! 🎉</h3>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">We hope you had a wonderful journey. Take a moment to rate your experience.</p>
+              </div>
+
+              {/* Rating Field */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-neutral-400 tracking-wider block">How was your trip?</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className="p-1 cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                    >
+                      <Star 
+                        className={`w-8 h-8 ${
+                          star <= rating 
+                            ? 'text-amber-500 fill-amber-500' 
+                            : 'text-neutral-300 dark:text-neutral-700'
+                        }`} 
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Platform Help */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-neutral-400 tracking-wider block">Did SkyTrip help you?</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {['Yes', 'No', 'Somewhat'].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setPlatformHelp(option)}
+                      className={`py-2 px-3 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+                        platformHelp === option
+                          ? 'bg-primary border-primary text-white'
+                          : 'bg-neutral-50 dark:bg-neutral-800/40 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* PDF QR Usage */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-neutral-400 tracking-wider block">Did you use the offline PDF / QR codes?</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {['Yes', 'No'].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setUsedPdfQr(option)}
+                      className={`py-2 px-3 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+                        usedPdfQr === option
+                          ? 'bg-primary border-primary text-white'
+                          : 'bg-neutral-50 dark:bg-neutral-800/40 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Feedback Textarea */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-neutral-400 tracking-wider block">Comments or memories (optional)</label>
+                <textarea
+                  value={feedbackNotes}
+                  onChange={(e) => setFeedbackNotes(e.target.value)}
+                  placeholder="Tell us about your highlights..."
+                  className="w-full text-xs bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 outline-none focus:border-primary transition-colors text-neutral-800 dark:text-neutral-100 placeholder-neutral-400 resize-none h-20"
+                />
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="flex gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                <button
+                  type="button"
+                  onClick={() => handleSubmitFeedback(true)}
+                  disabled={isSubmitting}
+                  className="flex-1 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                >
+                  Skip Feedback
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSubmitFeedback(false)}
+                  disabled={isSubmitting}
+                  className="flex-1 py-2.5 rounded-xl bg-primary hover:bg-[#FF5A3A] text-white text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-primary/10"
+                >
+                  {isSubmitting ? (
+                    <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                  ) : (
+                    <span>Submit & Complete</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="hidden print:block">
         <PrintTravelGuide trip={tripDetailInfo || undefined} />
       </div>

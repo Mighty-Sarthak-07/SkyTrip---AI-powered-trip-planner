@@ -13,6 +13,10 @@ const menuOptions = [
         href: "/",
     },
     {
+        name: "Dashboard",
+        href: "/dashboard",
+    },
+    {
         name: "Pricing",
         href: "/pricing",
     },

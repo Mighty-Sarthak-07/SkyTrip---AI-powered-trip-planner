@@ -10,7 +10,7 @@ const containerStyle = {
     borderRadius: '16px'
 };
 
-const LIBRARIES: ("places" | "drawing" | "geometry" | "localContext" | "visualization")[] = ["places"];
+const LIBRARIES: any = ["places"];
 
 const CATEGORIES = [
     { id: 'restaurant', name: 'Restaurants', icon: Utensils, type: 'restaurant' },

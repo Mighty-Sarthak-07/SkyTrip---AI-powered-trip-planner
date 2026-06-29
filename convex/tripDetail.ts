@@ -39,5 +39,28 @@ export const GetTripById = query({
     }
 });
 
+export const completeTripDetail = mutation({
+    args: {
+        tripId: v.string(),
+        uid: v.id("UserTable"),
+        feedback: v.optional(v.any()),
+    },
+    handler: async (ctx, args) => {
+        const trip = await ctx.db.query("TripDetailTable")
+            .filter(q => q.and(
+                q.eq(q.field("uid"), args.uid),
+                q.eq(q.field("tripId"), args.tripId)
+            )).first();
+        if (trip) {
+            await ctx.db.patch(trip._id, {
+                completed: true,
+                feedback: args.feedback,
+            });
+            return { success: true };
+        }
+        return { success: false, error: "Trip not found" };
+    }
+});
+
 
         

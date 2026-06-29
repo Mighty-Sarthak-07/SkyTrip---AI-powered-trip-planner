@@ -12,5 +12,7 @@ export default defineSchema({
     tripId: v.string(),
     tripDetail:v.any(),
     uid: v.id("UserTable"),
+    completed: v.optional(v.boolean()),
+    feedback: v.optional(v.any()),
   })
 });
