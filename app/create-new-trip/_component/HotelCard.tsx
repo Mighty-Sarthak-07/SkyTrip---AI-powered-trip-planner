@@ -30,17 +30,34 @@ const HotelCard = ({ selectedHotel, setSelectedHotel }: HotelCardProps) => {
     }
 
     const extractCity = (address: string): string => {
-        const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Bengaluru', 'Srinagar', 'Jaipur', 'Goa', 'Agra', 'Chennai', 'Hyderabad', 'Kolkata', 'Pune']
+        if (!address) return '';
+        const cities = [
+            'Mumbai', 'Delhi', 'Bangalore', 'Bengaluru', 'Srinagar', 'Jaipur', 'Goa', 'Agra', 
+            'Chennai', 'Hyderabad', 'Kolkata', 'Pune', 'Manali', 'Shimla', 'Udaipur', 'Kochi', 
+            'Ooty', 'Munnar', 'Varanasi', 'Amritsar', 'Jaisalmer', 'Jodhpur', 'Rishikesh'
+        ];
         for (const city of cities) {
-            if (address.includes(city)) return city
+            if (address.toLowerCase().includes(city.toLowerCase())) return city;
         }
-        return 'Mumbai'
+
+        const parts = address.split(',').map(p => p.trim());
+        const ignoredWords = ['india', 'usa', 'united states', 'uk', 'united kingdom', 'vietnam', 'thailand', 'singapore', 'malaysia', 'indonesia'];
+        
+        for (let i = parts.length - 1; i >= 0; i--) {
+            const part = parts[i];
+            if (/\d/.test(part)) continue;
+            if (ignoredWords.includes(part.toLowerCase())) continue;
+            return part;
+        }
+        return '';
     }
 
     const handleBookNow = (hotel: any) => {
-        const city = extractCity(hotel.hotel_address)
-        const url = `https://www.makemytrip.com/hotels/${city.toLowerCase()}-hotels.html`
-        window.open(url, '_blank')
+        const hotelName = hotel.hotel_name || '';
+        const city = extractCity(hotel.hotel_address);
+        const query = `site:makemytrip.com/hotels/ "${hotelName}" ${city}`;
+        const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        window.open(url, '_blank');
     }
 
     return (

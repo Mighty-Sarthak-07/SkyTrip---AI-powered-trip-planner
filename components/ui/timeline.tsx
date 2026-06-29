@@ -12,7 +12,7 @@ interface TimelineEntry {
   content: React.ReactNode;
 }
 
-export const Timeline = ({ data, tripData }: { data: TimelineEntry[]; tripData: any }) => {
+export const Timeline = ({ data, tripData, activeDay, setActiveDay }: { data: TimelineEntry[]; tripData: any, activeDay?: number | null, setActiveDay?: (day: number | null) => void }) => {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
@@ -58,28 +58,71 @@ export const Timeline = ({ data, tripData }: { data: TimelineEntry[]; tripData: 
       </div>
 
       <div ref={ref} className="relative max-w-7xl mx-auto pb-20">
-        {data.map((item, index) => (
-          <div
-            key={index}
-            className="flex justify-start pt-5 md:pt-7 md:gap-10"
-          >
-            <div className="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-[40%]">
-              <div className="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-white dark:bg-black flex items-center justify-center">
-                <div className="h-4 w-4 rounded-full bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 p-2" />
-              </div>
-              <h3 className="hidden md:block text-xl md:pl-20 md:text-3xl font-bold text-gray-600 dark:text-white ">
-                {item.title}
-              </h3>
-            </div>
+        {data.map((item, index) => {
+          const dayMatch = item.title.match(/Day\s+(\d+)/i);
+          const dayNumber = dayMatch ? parseInt(dayMatch[1], 10) : null;
+          const isActive = dayNumber !== null && activeDay === dayNumber;
 
-            <div className="relative pl-20 pr-4 md:pl-4 w-full">
-              <h3 className="md:hidden block text-2xl mb-4 text-left font-bold text-neutral-500 dark:text-neutral-500">
-                {item.title}
-              </h3>
-              {item.content}{" "}
+          const handleToggleDay = () => {
+            if (dayNumber !== null && setActiveDay) {
+              setActiveDay(isActive ? null : dayNumber);
+            }
+          };
+
+          return (
+            <div
+              key={index}
+              className={`flex justify-start pt-5 md:pt-7 md:gap-10 transition-all duration-300 ${
+                isActive ? 'opacity-100' : activeDay !== null && dayNumber !== null ? 'opacity-40' : 'opacity-100'
+              }`}
+            >
+              <div className="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-[40%]">
+                <div 
+                  onClick={handleToggleDay}
+                  className={`h-10 absolute left-3 md:left-3 w-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    dayNumber !== null ? 'cursor-pointer hover:scale-110 active:scale-95' : ''
+                  } ${isActive ? 'bg-primary/20 scale-110' : 'bg-white dark:bg-black'}`}
+                >
+                  <div className={`h-4 w-4 rounded-full border transition-all duration-300 ${
+                    isActive 
+                      ? 'bg-primary border-primary' 
+                      : 'bg-neutral-200 dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700'
+                  }`} />
+                </div>
+                <h3 
+                  onClick={handleToggleDay}
+                  className={`hidden md:block text-xl md:pl-20 md:text-3xl font-bold transition-all duration-300 ${
+                    dayNumber !== null ? 'cursor-pointer hover:text-primary' : ''
+                  } ${isActive ? 'text-primary scale-105' : 'text-gray-600 dark:text-white'}`}
+                >
+                  {item.title}
+                  {dayNumber !== null && (
+                    <span className="block text-[10px] font-medium text-neutral-400 dark:text-neutral-500 mt-1 font-sans">
+                      {isActive ? '🟢 Active Route' : '📍 Show Route'}
+                    </span>
+                  )}
+                </h3>
+              </div>
+
+              <div className="relative pl-20 pr-4 md:pl-4 w-full">
+                <h3 
+                  onClick={handleToggleDay}
+                  className={`md:hidden block text-2xl mb-4 text-left font-bold transition-all duration-300 ${
+                    dayNumber !== null ? 'cursor-pointer hover:text-primary' : ''
+                  } ${isActive ? 'text-primary' : 'text-neutral-500 dark:text-neutral-500'}`}
+                >
+                  {item.title}
+                  {dayNumber !== null && (
+                    <span className="block text-xs font-medium text-neutral-400 dark:text-neutral-500 mt-1 font-sans">
+                      {isActive ? '🟢 Active Route' : '📍 Show Route'}
+                    </span>
+                  )}
+                </h3>
+                {item.content}{" "}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div
           style={{
             height: height + "px",

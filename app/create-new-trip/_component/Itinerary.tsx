@@ -3,7 +3,7 @@
 import { useTripDetail } from "@/app/provider";
 import { Timeline } from "@/components/ui/timeline";
 import axios from "axios";
-import {ArrowLeft, Clock, ExternalLink, MapPin, Star, Ticket, Wallet } from "lucide-react";
+import { ArrowLeft, Clock, ExternalLink, MapPin, Star, Ticket, Wallet } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ActivityCard from "./ActivityCard";
@@ -244,10 +244,10 @@ const HotelGridItem = ({ hotel, index, setSelectedHotel }: { hotel: any, index: 
             </div>
 
             <div className="flex justify-between items-center mt-auto">
-                <Wallet className="w-5 h-5 text-green-600" /> <p className="text-green-600 font-bold text-lg">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
+                <Wallet className="w-5 h-5 text-green-600" /> <p className="text-green-600 font-bold text-md">{hotel.price_per_night}<span className="text-xs text-neutral-400 font-normal">/night</span></p>
                 <button
                     onClick={() => setSelectedHotel(hotel)}
-                    className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
+                    className="bg-black dark:bg-white text-white dark:text-black px-4 py-1 rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
                 >
                     View Hotel
                 </button>
@@ -325,7 +325,7 @@ const ActivityGridItem = ({ activity, index, setSelectedActivity }: { activity: 
     )
 }
 
-const Itinerary = ({ trip }: { trip?: TripInfo }) => {
+const Itinerary = ({ trip, activeDay, setActiveDay }: { trip?: TripInfo, activeDay?: number | null, setActiveDay?: (day: number | null) => void }) => {
     //ts-ignore
     const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
     const [tripData, setTripData] = useState<TripInfo | null>(null);
@@ -378,7 +378,7 @@ const Itinerary = ({ trip }: { trip?: TripInfo }) => {
     return (
         <div className="relative w-full overflow-clip">
             {tripData ? (
-                <Timeline data={data} tripData={tripData} />
+                <Timeline data={data} tripData={tripData} activeDay={activeDay} setActiveDay={setActiveDay} />
             ) : (
                 <div className="relative h-[80vh] w-full rounded-2xl overflow-hidden shadow-2xl group">
                     <Image
