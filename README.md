@@ -1,96 +1,142 @@
+# SkyTrip - AI-Powered Trip Planner
+
 <div align="center">
   <img src="./public/logo.svg" alt="SkyTrip Logo" width="100" height="auto" />
-  <h1>✈️ SkyTrip - AI Powered Travel Planner</h1>
-  <p><strong>Transforming travel planning with cutting-edge AI and seamless real-time interactions.</strong></p>
+  <h2>✈️ SkyTrip - AI-Powered Travel Planner</h2>
+  <p><strong>Transforming travel planning with cutting-edge AI, interactive mapping, and real-time assistant chats.</strong></p>
 
   <p>
     <img src="https://img.shields.io/badge/Next.js%2015-000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
     <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
     <img src="https://img.shields.io/badge/Gemini_AI-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini AI" />
     <img src="https://img.shields.io/badge/Clerk%20Auth-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk" />
     <img src="https://img.shields.io/badge/Convex-000?style=for-the-badge&logo=convex&logoColor=white" alt="Convex" />
   </p>
-
-  <p>
-    <i>Crafted with ❤️ by <b>Sarthak Kesarwani</b></i> <br/>
-    <a href="https://linkedin.com/in/sarthak-kesarwani">LinkedIn</a> |
-    <a href="https://github.com/Mighty-Sarthak-07">GitHub</a> |
-    <a href="https://twitter.com/SarthakKesarwani">Twitter</a>
-  </p>
 </div>
 
-<hr/>
+---
 
-## ✨ Introduction
-**SkyTrip** is a next-generation AI travel planner designed to replace hours of research, multiple chaotic browser tabs, and complex bookings with one **intelligent conversation**. 
+## ✨ Overview
 
-Just tell the AI where you want to go, who you are traveling with, and your budget, and SkyTrip will orchestrate a complete, personalized, day-by-day itinerary with exact coordinate details, live hotel listings, and ticket estimates.
+**SkyTrip** is a next-generation AI travel planner designed to replace hours of research, chaotic browser tabs, and fragmented planning notes with a single, unified travel hub. 
 
-> **Key Mission**: "Technology should remove friction from travel, not add it."
+Provide your destination, budget, duration, and travel crew, and SkyTrip will dynamically construct a complete day-by-day itinerary complete with live hotel listings, location markers, ticket estimates, and an interactive route-drawn map.
 
-## 🚀 Key Features
+---
 
-- **🧠 Advanced AI Itinerary Generation:** Chat naturally with the AI travel agent. It parses constraints and dynamically generates a personalized itinerary in highly optimized JSON.
-- **🏨 Seamless Booking Integrations:** Integrates intelligently with platforms like MakeMyTrip. We parse local cities dynamically from addresses to create fully functional, auto-filtered direct checkout URLs.
-- **🔐 Clerk Powered Auth & Security:** Seamless onboarding using Clerk integrations. Rate limiting and bot-protection on API endpoints robustly handled via Arcjet. 
-- **⚡ Real-Time Backend:** Convex database acts as our ultra-fast serverless real-time caching and data persistence layer, rendering load times obsolete.
-- **🎨 Elite UI/UX & Glassmorphism:** Features fluid animations (via Framer Motion), sleek glassmorphism dark/light design systems, and responsive components curated to wow users on first impression.
-- **🗺️ Discovery Engine:** Browse AI-curated *Hidden Gems*, *Trending Destinations*, and *Adventures* mapped to thrill-scale metrics.
+## 🛠️ Technology Stack & Architecture
 
-## 🛠️ Architecture & Tech Stack
+SkyTrip is architected using a modern, robust, and highly performant full-stack ecosystem:
 
-This repository showcases my ability to architect robust, scalable, and full-stack solutions:
+*   **Framework:** [Next.js 15](https://nextjs.org/) (App Router, Server Actions, API Routes)
+*   **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict compilation configurations for type safety)
+*   **AI Engine:** [Google Gemini API / OpenRouter](https://ai.google.dev/) (Leverages structured schema validation for consistent JSON itinerary structure)
+*   **Real-time Database & BaaS:** [Convex](https://www.convex.dev/) (Zero-latency reactive data synchronization and edge database operations)
+*   **Authentication & Security:** [Clerk Auth](https://clerk.com/) (Secure sign-ins, sign-ups, and user sessions)
+*   **Map Integrations:** [Google Maps Platform](https://developers.google.com/maps) (`@react-google-maps/api` for custom markers, path polylines, and dynamic coordinate fitting; Google Places API for context-based hotel and activity image lookup)
+*   **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) (Responsive, modern design system featuring custom utility classes)
+*   **Animations:** [Framer Motion / Motion](https://motion.dev/) (Fluid layout transitions, timelines, and dynamic page effects)
+*   **API Protection:** [Arcjet](https://arcjet.com/) (Protects API routes with token bucket rate limiting and bot detection)
 
-* **Framework:** Next.js 15 (App Router, Server Actions, API Routes)
-* **Language:** TypeScript (Strict typing for robust, error-free models)
-* **AI Orchestration:** Google Gemini / OpenRouter integration for high quality, schema-validated JSON outputs.
-* **Authentication:** Clerk Auth
-* **Database & BaaS:** Convex (Real-time syncing and serverless edge functions)
-* **Styling & Motion:** Tailwind CSS + Framer Motion (Modern, performant web animations)
-* **Security Layer:** Arcjet (Rate limiting and unauthorized access prevention)
+---
 
-## 📸 Sneak Peek
-*(To truly experience the application, clone the repo and run it locally!)*
-- Crisp gradient typography and micro-interactions.
-- Custom interactive modal components for Hotels and Day Plans.
-- Gorgeous location-based image fetching utilizing Google Places API.
+## 🚀 Key Features & Implementation
+
+### 1. 🧠 Structured AI Itinerary Generation
+*   Takes user inputs and sends custom prompts to Gemini to construct structured, type-safe JSON itinerary documents containing activities, hotels, details, and exact geographical coordinates.
+*   Integrates fallback systems to ensure elegant handling of API errors or format variations.
+
+### 2. 🗺️ Interactive Maps & Dynamic Day Filtering
+*   Incorporates a detailed, custom-themed **Google Map** (`GlobalMap`) directly beside the itinerary.
+*   **Dynamic Route Drawing:** Select a specific day on the trip timeline to instantly highlight that day's activities. The map dynamically updates its bounds to focus on that region and draws a polyline route (Hotel ➔ Activity 1 ➔ Activity 2 ➔ Hotel).
+*   Includes a functional **Overview** resetting action button that instantly centers the map view to display all days and hotels.
+
+### 3. 💬 Real-Time AI Travel Chatbot Assistant
+*   Features a persistent floating chatbot (`TripChatbot`) on the trip detail screen.
+*   Pre-loaded with the generated trip context so it can immediately answer specific queries (e.g., packing tips, estimated ticket pricing, hotel reviews, food recommendations, and local travel tips).
+*   Supports standard typing interactions as well as quick-click suggested questions.
+
+### 4. 🏨 Booking & Places Engine
+*   Integrates direct booking redirects to popular booking platforms, appending location-specific parameters.
+*   Fetches high-quality location photos on the fly from the Google Places API with robust placeholder fallbacks for when images are unavailable.
+
+### 5. 🎒 Checklist Tracker
+*   Auto-populates a packing list (`PackingList`) suited for the duration and theme of the trip, allowing users to check off items as they pack.
+
+---
+
+## 📂 Project Structure
+
+```
+├── app/
+│   ├── api/
+│   │   └── chat/                    # API route for handling AI chatbot assistant requests
+│   ├── view-trip/
+│   │   └── [tripId]/                # Main page displaying the generated trip details
+│   ├── create-new-trip/
+│   │   ├── page.tsx                 # Form to customize and trigger AI trip creation
+│   │   └── _component/
+│   │       ├── GlobalMap.tsx        # Google Maps wrapper (markers, bounds, and polylines)
+│   │       ├── Itinerary.tsx        # Timeline-based day-by-day planner component
+│   │       ├── PackingList.tsx      # Checklist generator component
+│   │       └── TripChatbot.tsx      # Floating contextual AI chatbot
+│   ├── layout.tsx                   # Main global layout and Tailwind imports
+│   └── provider.tsx                 # Global state providers (Clerk, Convex, state hooks)
+├── components/
+│   └── ui/                          # Custom UI design tokens, buttons, and animations
+├── convex/
+│   ├── schema.ts                    # Convex relational database tables and schemas
+│   └── tripDetail.ts                # Convex query definitions for fetching trips by ID
+└── package.json                     # Root manifest and run configurations
+```
+
+---
 
 ## 🏃‍♂️ Getting Started
 
-Want to run this masterpiece locally? 
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Mighty-Sarthak-07/SkyTrip---AI-powered-trip-planner.git
+cd SkyTrip---AI-powered-trip-planner
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Mighty-Sarthak-07/SkyTrip.git
-   cd SkyTrip
-   ```
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+### 3. Setup Environment Variables
+Create a `.env.local` file in the root directory:
+```env
+# Clerk Credentials
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key
+CLERK_SECRET_KEY=your_secret_key
 
-3. **Set up Environment Variables**
-   Create a `.env.local` file in the root and add your keys:
-   ```env
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_key
-   CLERK_SECRET_KEY=your_key
-   OPENROUTER_API=your_openrouter_or_gemini_key
-   # Convex and Google Map Api keys...
-   ```
+# Convex Database Credentials
+CONVEX_DEPLOYMENT=your_convex_deployment
+NEXT_PUBLIC_CONVEX_URL=your_convex_url
 
-4. **Launch Development Server**
-   ```bash
-   npm run dev
-   ```
-   *Visit `http://localhost:3000` and let the journey begin!*
+# API Access Keys
+NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_google_maps_and_places_key
+OPENAI_API_KEY=your_gemini_or_openrouter_api_key
+```
 
-## 💡 Why This Project Stands Out (To Recruiters!)
-* **Production-Grade Code:** Utilizes Next.js 15's bleeding-edge features, rigorous TypeScript interfaces, and modularized UI components.
-* **Complex Data Flows:** Shows the ability to wrangle unpredictable AI text models into strictly structured, type-safe JSON formats that drive dynamic frontends.
-* **User-Centric Engineering:** Meticulous attention to detail on the frontend—handling image fallbacks, smart auto-direct checkout flows, and beautiful fluid animations.
-* **Security & Performance Aware:** Integrates Arcjet to gatekeeper API limits and optimizes Next.js font loads and image domains to hit perfect Lighthouse scores.
+### 4. Sync Database Schema & Mutations
+In a separate terminal tab, run the Convex development engine:
+```bash
+npx convex dev
+```
+
+### 5. Launch the Client Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) and design your first adventure!
 
 ---
-*If you are reading this and hiring, let's build the future together.* 🚀
+
+## 💡 Engineering Highlights
+*   **Fully Responsive Splits:** Features an adaptive layout that renders side-by-side (60/40) on wider viewports and gracefully stacks vertically on smaller mobile viewports.
+*   **Strict Typing:** Designed with compile-time type verification, minimizing production runtime errors.
+*   **Contextual Caching:** Persists itineraries inside Convex, ensuring instant loading states for returning users without triggering repeated AI API queries.
