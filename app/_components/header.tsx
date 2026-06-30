@@ -21,6 +21,10 @@ const menuOptions = [
         href: "/pricing",
     },
     {
+        name: "Travel Tools",
+        href: "/tools/converter",
+    },
+    {
         name: "About",
         href: "/about",
     },

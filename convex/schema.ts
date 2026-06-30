@@ -7,6 +7,7 @@ export default defineSchema({
     imageUrl: v.string(),
     email: v.string(),
     subscription: v.optional(v.string()),
+    aiCredits: v.optional(v.number()),
   }),
   TripDetailTable: defineTable({
     tripId: v.string(),

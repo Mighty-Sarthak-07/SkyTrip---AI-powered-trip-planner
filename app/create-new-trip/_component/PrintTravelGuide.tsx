@@ -1,12 +1,14 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { TripInfo } from './chatbox';
+import { AIResponse, detectLocationDetails, DEFAULT_RECOMMENDATIONS } from './TripPlannerAddon';
 
 interface PrintTravelGuideProps {
     trip: TripInfo | undefined;
+    addonData?: AIResponse | null;
 }
 
-const PrintTravelGuide: React.FC<PrintTravelGuideProps> = ({ trip }) => {
+const PrintTravelGuide: React.FC<PrintTravelGuideProps> = ({ trip, addonData }) => {
     const [liveUrl, setLiveUrl] = useState('');
 
     useEffect(() => {
@@ -16,6 +18,41 @@ const PrintTravelGuide: React.FC<PrintTravelGuideProps> = ({ trip }) => {
     }, []);
 
     if (!trip) return null;
+
+    // Resolve origin and destination
+    const localOrigin = detectLocationDetails(trip.origin || "Delhi", true);
+    const localDestination = detectLocationDetails(trip.destination || "Japan", false);
+    const origin = addonData?.origin || localOrigin;
+    const destination = addonData?.destination || localDestination;
+    const isDomestic = addonData ? addonData.isDomestic : (origin.country === destination.country);
+
+    // Timezone difference calculation
+    let offsetHoursDiff = addonData?.timezoneOffsetDifference ?? 0;
+    if (!addonData) {
+        try {
+            const getOffset = (tz: string) => {
+                const d = new Date();
+                const formatter = new Intl.DateTimeFormat("en-US", {
+                    timeZone: tz,
+                    timeZoneName: "longOffset"
+                });
+                const parts = formatter.formatToParts(d);
+                const offsetString = parts.find(p => p.type === "timeZoneName")?.value || "";
+                if (!offsetString || offsetString === "GMT") return 0;
+                const match = offsetString.match(/GMT([+-])(\d+):?(\d*)/);
+                if (!match) return 0;
+                const sign = match[1] === "+" ? 1 : -1;
+                const hours = parseInt(match[2]);
+                const minutes = parseInt(match[3] || "0");
+                return sign * (hours + minutes / 60);
+            };
+            offsetHoursDiff = getOffset(destination.timezone) - getOffset(origin.timezone);
+        } catch {
+            offsetHoursDiff = 0;
+        }
+    }
+
+    const recommendations = addonData?.recommendations || DEFAULT_RECOMMENDATIONS;
 
     // Helper to get QR Code URL
     const getQrUrl = (data: string) => {
@@ -282,6 +319,46 @@ const PrintTravelGuide: React.FC<PrintTravelGuideProps> = ({ trip }) => {
                     </div>
                 </div>
             </div>
+
+            {/* PAGE 5: AI COMPANION RECOMMENDATIONS */}
+            {recommendations && recommendations.length > 0 && (
+                <div className="page-break pt-12">
+                    <div className="border-b-2 border-neutral-900 pb-3 mb-6">
+                        <h2 className="text-2xl font-black uppercase tracking-wider text-neutral-950">AI Companion Guide</h2>
+                        <p className="text-xs text-neutral-500 font-medium">Localized currency, timezone, and protocol recommendations for {destination.city}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="border border-neutral-200 rounded-xl p-4 bg-neutral-50 flex flex-col justify-center text-center">
+                            <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider mb-1">Currency Info</span>
+                            <span className="font-extrabold text-neutral-800 text-sm">
+                                {origin.flag} {origin.currencyCode} ({origin.currencySymbol}) → {destination.flag} {destination.currencyCode} ({destination.currencySymbol})
+                            </span>
+                        </div>
+                        <div className="border border-neutral-200 rounded-xl p-4 bg-neutral-50 flex flex-col justify-center text-center">
+                            <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider mb-1">Timezone Offset</span>
+                            <span className="font-extrabold text-neutral-800 text-sm">
+                                {isDomestic && offsetHoursDiff === 0 
+                                  ? "Same Timezone" 
+                                  : `${Math.abs(offsetHoursDiff)}h ${offsetHoursDiff > 0 ? 'ahead' : 'behind'}`
+                                }
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        {recommendations.map((rec: any, idx: number) => (
+                            <div key={idx} className="no-break border border-neutral-200 rounded-xl p-5 bg-white shadow-sm space-y-1.5">
+                                <span className="text-[9px] font-black uppercase tracking-wider text-orange-600 bg-orange-50 border border-orange-100 px-2.5 py-0.5 rounded-full inline-block">
+                                    {rec.category}
+                                </span>
+                                <h3 className="font-bold text-neutral-900 text-sm">{rec.title}</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed">{rec.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

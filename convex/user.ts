@@ -18,10 +18,30 @@ export const CreateNewUser = mutation({
         name: args.name,
         email: args.email,
         imageUrl: args.imageUrl,
+        aiCredits: 3,
       };
-      await ctx.db.insert("UserTable", userData);
-      return userData;
+      const userId = await ctx.db.insert("UserTable", userData);
+      return { _id: userId, ...userData };
     }
     return user[0];
+  },
+});
+
+export const DecrementAICredits = mutation({
+  args: {
+    uid: v.id("UserTable"),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.uid);
+    if (!user) throw new Error("User not found");
+
+    const currentCredits = user.aiCredits ?? 3;
+    const nextCredits = Math.max(0, currentCredits - 1);
+
+    await ctx.db.patch(args.uid, {
+      aiCredits: nextCredits,
+    });
+
+    return { ...user, aiCredits: nextCredits };
   },
 });

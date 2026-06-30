@@ -2,6 +2,7 @@
 import GlobalMap from '@/app/create-new-trip/_component/GlobalMap'
 import Itinerary from '@/app/create-new-trip/_component/Itinerary'
 import PackingList from '@/app/create-new-trip/_component/PackingList'
+import TripPlannerAddon from '@/app/create-new-trip/_component/TripPlannerAddon'
 import TripChatbot from '@/app/create-new-trip/_component/TripChatbot'
 import PrintTravelGuide from '@/app/create-new-trip/_component/PrintTravelGuide'
 import { useTripDetail, useUserDetail } from '@/app/provider'
@@ -9,6 +10,7 @@ import { api } from '@/convex/_generated/api'
 import { useConvex, useMutation } from 'convex/react'
 import { ArrowLeft, Check, CheckCircle, X, Star } from 'lucide-react'
 import { toast } from 'sonner'
+import axios from 'axios'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -21,6 +23,7 @@ const ViewTrip = () => {
 
   const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
   const [activeDay, setActiveDay] = useState<number | null>(null);
+  const [addonData, setAddonData] = useState<any>(null);
 
   // Feedback Modal State
   const [showCompleteModal, setShowCompleteModal] = useState(false);
@@ -35,14 +38,30 @@ const ViewTrip = () => {
     userDetail && GetTripDetail();
   }, [userDetail])
 
+  const fetchAddonData = async (origin: string, destination: string) => {
+    try {
+      const res = await axios.post("/api/trip-addon", { origin, destination });
+      if (res.data && !res.data.error) {
+        setAddonData(res.data);
+      }
+    } catch (err) {
+      console.error("Error fetching addon data in page", err);
+    }
+  };
+
   const GetTripDetail = async () => {
     const result = await convex.query(api?.tripDetail.GetTripById, {
       tripId: tripId + "",
       uid: userDetail._id
     });
     console.log(result);
-    setTripDetailInfo(result?.tripDetail);
+    const tripDetail = result?.tripDetail;
+    setTripDetailInfo(tripDetail);
     setTripDetailRecord(result);
+
+    if (tripDetail?.origin && tripDetail?.destination) {
+      fetchAddonData(tripDetail.origin, tripDetail.destination);
+    }
   }
 
   const handleSubmitFeedback = async (isSkipped = false) => {
@@ -115,6 +134,9 @@ const ViewTrip = () => {
               </div>
 
               <GlobalMap trip={tripDetailInfo} activeDay={activeDay} />
+              <div className="mt-6">
+                <TripPlannerAddon trip={tripDetailInfo || undefined} initialData={addonData} />
+              </div>
               <div className="mt-6">
                 <PackingList trip={tripDetailInfo || undefined} />
               </div>
@@ -245,7 +267,7 @@ const ViewTrip = () => {
       )}
 
       <div className="hidden print:block">
-        <PrintTravelGuide trip={tripDetailInfo || undefined} />
+        <PrintTravelGuide trip={tripDetailInfo || undefined} addonData={addonData} />
       </div>
     </>
   )
