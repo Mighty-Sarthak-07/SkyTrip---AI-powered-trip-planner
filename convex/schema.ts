@@ -15,5 +15,6 @@ export default defineSchema({
     uid: v.id("UserTable"),
     completed: v.optional(v.boolean()),
     feedback: v.optional(v.any()),
+    companionData: v.optional(v.any()),
   })
 });

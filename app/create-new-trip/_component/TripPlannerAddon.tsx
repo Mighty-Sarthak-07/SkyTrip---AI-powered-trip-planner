@@ -19,10 +19,11 @@ import {
 } from "lucide-react";
 import { TripInfo } from "./chatbox";
 import { useAuth } from '@clerk/nextjs';
-import { useUserDetail } from '@/app/provider';
+import { useUserDetail, useTripDetail } from '@/app/provider';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export interface LocationDetails {
   city: string;
@@ -43,6 +44,12 @@ export interface AIResponse {
     category: string;
     title: string;
     description: string;
+  }[];
+  events: {
+    name: string;
+    date: string;
+    description: string;
+    type: string;
   }[];
 }
 
@@ -314,6 +321,27 @@ export const DEFAULT_RECOMMENDATIONS = [
   }
 ];
 
+export const DEFAULT_EVENTS = [
+  {
+    name: "Local Cultural Festivals",
+    date: "Seasonal",
+    description: "Experience regional street food markets, craft fairs, and seasonal celebrations happening at local hubs.",
+    type: "Festival"
+  },
+  {
+    name: "Seasonal Outdoor Activities",
+    date: "Monthly",
+    description: "Explore botanical gardens, parks, and seasonal highlights specific to this time of year.",
+    type: "Seasonal"
+  },
+  {
+    name: "Weekend Markets & Fleas",
+    date: "Weekly",
+    description: "Visit traditional handicraft markets, fresh food stalls, and community popups.",
+    type: "Market"
+  }
+];
+
 interface AddonProps {
   trip?: TripInfo;
   initialData?: AIResponse | null;
@@ -326,9 +354,77 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
   const decrementAICredits = useMutation(api.user.DecrementAICredits);
   const dbCredits = userDetail?.aiCredits ?? 3;
 
-  const [activeTab, setActiveTab] = useState<"currency" | "timezone">("currency");
+  const [activeTab, setActiveTab] = useState<"currency" | "timezone" | "events">("currency");
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiData, setAiData] = useState<AIResponse | null>(null);
+
+  const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
+  const updateItinerary = useMutation(api.tripDetail.updateTripItinerary);
+  const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(null);
+
+  const handleAddEventToItinerary = async (event: any, dayIndex: number) => {
+    // Determine active trip detail
+    const activeTrip = trip || tripDetailInfo;
+    if (!activeTrip || !userDetail?._id) {
+      toast.error("You can only add events to a saved itinerary.");
+      return;
+    }
+
+    try {
+      const currentItinerary = activeTrip.itinerary ? JSON.parse(JSON.stringify(activeTrip.itinerary)) : [];
+      if (!currentItinerary[dayIndex]) {
+        toast.error("Selected Day is invalid");
+        return;
+      }
+
+      const defaultGeo = currentItinerary[0]?.activities?.[0]?.geo_coordinates || { latitude: 0, longitude: 0 };
+      
+      const newActivity = {
+        place_name: event.name,
+        place_details: event.description,
+        place_image_url: "",
+        geo_coordinates: defaultGeo,
+        place_address: `Local Event (${event.type})`,
+        ticket_pricing: "Free / Local Entry",
+        time_travel_each_location: "N/A",
+        best_time_to_visit: event.date || "Flexible"
+      };
+
+      if (!currentItinerary[dayIndex].activities) {
+        currentItinerary[dayIndex].activities = [];
+      }
+      currentItinerary[dayIndex].activities.push(newActivity);
+
+      const updatedTrip = {
+        ...activeTrip,
+        itinerary: currentItinerary
+      };
+
+      // Extract raw tripId (from useParams or the prop)
+      const targetTripId = (activeTrip as any).tripId || (tripDetailInfo as any)?.tripId;
+      if (!targetTripId) {
+        toast.error("Trip ID not found");
+        return;
+      }
+
+      const result = await updateItinerary({
+        tripId: targetTripId,
+        uid: userDetail._id,
+        tripDetail: updatedTrip
+      });
+
+      if (result.success) {
+        setTripDetailInfo(updatedTrip);
+        toast.success(`"${event.name}" added to Day ${dayIndex + 1}! 🎉`);
+        setSelectedEventIndex(null);
+      } else {
+        toast.error("Failed to update itinerary in database");
+      }
+    } catch (err) {
+      console.error("Add event error", err);
+      toast.error("Failed to add event to itinerary");
+    }
+  };
 
   // Standalone Mode & Search Inputs
   const isStandalone = !trip;
@@ -572,6 +668,21 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
 
   const recommendations = aiData?.recommendations || DEFAULT_RECOMMENDATIONS;
 
+  const googleFlightsUrl = useMemo(() => {
+    const cleanCity = (name: string) => {
+      if (!name) return "";
+      return name.split(",")[0].trim();
+    };
+    const originCity = cleanCity(origin.city);
+    const destCity = cleanCity(destination.city);
+
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
+    const dateString = date.toISOString().split("T")[0]; // YYYY-MM-DD
+    const query = `Flights to ${destCity} from ${originCity} on ${dateString}`;
+    return `https://www.google.com/travel/flights?q=${encodeURIComponent(query)}`;
+  }, [origin.city, destination.city]);
+
   return (
     <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-3xl p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow">
       
@@ -637,17 +748,24 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
         <div className="flex bg-neutral-50 dark:bg-neutral-800/40 p-1 rounded-xl border border-neutral-100 dark:border-neutral-800/80">
           <button 
             onClick={() => setActiveTab("currency")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === 'currency' ? 'bg-white dark:bg-neutral-800 shadow-sm text-neutral-950 dark:text-white' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300'}`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === 'currency' ? 'bg-white dark:bg-neutral-800 shadow-sm text-neutral-950 dark:text-white' : 'text-neutral-500 hover:text-neutral-850 dark:hover:text-neutral-355'}`}
           >
             <Coins className="w-3.5 h-3.5" />
-            <span>Currency Converter</span>
+            <span>Currency</span>
           </button>
           <button 
             onClick={() => setActiveTab("timezone")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === 'timezone' ? 'bg-white dark:bg-neutral-800 shadow-sm text-neutral-950 dark:text-white' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300'}`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === 'timezone' ? 'bg-white dark:bg-neutral-800 shadow-sm text-neutral-950 dark:text-white' : 'text-neutral-500 hover:text-neutral-850 dark:hover:text-neutral-355'}`}
           >
             <Clock className="w-3.5 h-3.5" />
-            <span>Time Zone Planner</span>
+            <span>Timezone</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab("events")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === 'events' ? 'bg-white dark:bg-neutral-800 shadow-sm text-neutral-950 dark:text-white' : 'text-neutral-500 hover:text-neutral-850 dark:hover:text-neutral-355'}`}
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Events</span>
           </button>
         </div>
       </div>
@@ -789,7 +907,7 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
             {ratesUpdated && <span>Updated {ratesUpdated}</span>}
           </div>
         </div>
-      ) : (
+      ) : activeTab === "timezone" ? (
         /* Timezone Tab */
         <div className="space-y-4">
           {/* Timezone Status Info */}
@@ -872,6 +990,88 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
             </div>
           )}
         </div>
+      ) : (
+        /* Events Tab */
+        <div className="space-y-4">
+          <div className="bg-orange-50/40 dark:bg-neutral-850/40 p-3 rounded-2xl border border-orange-100/50 dark:border-neutral-800/30 flex items-start gap-2.5">
+            <Calendar className="w-4 h-4 text-orange-500 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-xs font-bold text-neutral-800 dark:text-neutral-300">Local Festivals & Events</h4>
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-450 leading-normal font-medium mt-0.5">
+                Explore cultural festivals, concerts, public holidays, and seasonal highlights in {destination.city}.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+            {(aiData?.events || DEFAULT_EVENTS).map((event, index) => {
+              const isActive = selectedEventIndex === index;
+              const activeTrip = trip || tripDetailInfo;
+              const hasItinerary = activeTrip && activeTrip.itinerary && activeTrip.itinerary.length > 0;
+
+              return (
+                <div 
+                  key={index} 
+                  className="bg-neutral-50 dark:bg-neutral-800/30 border border-neutral-100 dark:border-neutral-800 rounded-2xl p-3.5 hover:bg-white dark:hover:bg-neutral-800/50 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-orange-500 bg-orange-50 dark:bg-orange-950/20 px-2 py-0.5 rounded">
+                      {event.type}
+                    </span>
+                    <span className="text-[10px] font-bold text-neutral-400">
+                      📅 {event.date}
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-neutral-850 dark:text-neutral-255 mb-1">{event.name}</h4>
+                  <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-405 mb-3 font-medium">
+                    {event.description}
+                  </p>
+
+                  {/* Add to Itinerary Button/Selector */}
+                  {hasItinerary ? (
+                    <div>
+                      {!isActive ? (
+                        <button 
+                          onClick={() => setSelectedEventIndex(index)}
+                          className="w-full py-1.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 rounded-xl text-[10px] font-bold transition-colors cursor-pointer"
+                        >
+                          Add to Itinerary
+                        </button>
+                      ) : (
+                        <div className="space-y-2">
+                          <label className="text-[9px] font-bold text-neutral-450 uppercase tracking-wider block">
+                            Select Day to Add:
+                          </label>
+                          <div className="flex gap-1.5 flex-wrap">
+                            {activeTrip.itinerary.map((day: any, dIdx: number) => (
+                              <button
+                                key={dIdx}
+                                onClick={() => handleAddEventToItinerary(event, dIdx)}
+                                className="px-3 py-1 bg-orange-50 hover:bg-orange-100 dark:bg-neutral-800 dark:hover:bg-neutral-750 text-orange-600 dark:text-orange-400 rounded-lg text-[10px] font-extrabold cursor-pointer border border-orange-100/50 dark:border-neutral-700 transition-colors"
+                              >
+                                Day {dIdx + 1}
+                              </button>
+                            ))}
+                            <button
+                              onClick={() => setSelectedEventIndex(null)}
+                              className="px-3 py-1 bg-neutral-100 hover:bg-neutral-205 dark:bg-neutral-800 dark:hover:bg-neutral-750 text-neutral-500 dark:text-neutral-400 rounded-lg text-[10px] font-bold cursor-pointer border border-neutral-200 dark:border-neutral-700 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-[9px] font-bold text-neutral-400 bg-neutral-100 dark:bg-neutral-800 py-1.5 text-center rounded-xl">
+                      Save Trip first to add to Itinerary
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       {/* Dynamic AI travel recommendations */}
@@ -908,6 +1108,19 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Quick Booking Actions */}
+      <div className="mt-5 pt-4 border-t border-neutral-100 dark:border-neutral-800 flex gap-2">
+        <a 
+          href={googleFlightsUrl} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/20 dark:hover:bg-blue-900/30 border border-blue-100 dark:border-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+        >
+          <Plane className="w-3.5 h-3.5" />
+          <span>Find Flights on Google Flights</span>
+        </a>
       </div>
     </div>
   );

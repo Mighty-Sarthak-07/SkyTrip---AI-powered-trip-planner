@@ -62,5 +62,49 @@ export const completeTripDetail = mutation({
     }
 });
 
+export const updateTripItinerary = mutation({
+    args: {
+        tripId: v.string(),
+        uid: v.id("UserTable"),
+        tripDetail: v.any(),
+    },
+    handler: async (ctx, args) => {
+        const trip = await ctx.db.query("TripDetailTable")
+            .filter(q => q.and(
+                q.eq(q.field("uid"), args.uid),
+                q.eq(q.field("tripId"), args.tripId)
+            )).first();
+        if (trip) {
+            await ctx.db.patch(trip._id, {
+                tripDetail: args.tripDetail,
+            });
+            return { success: true };
+        }
+        return { success: false, error: "Trip not found" };
+    }
+});
+
+export const SaveCompanionData = mutation({
+    args: {
+        tripId: v.string(),
+        uid: v.id("UserTable"),
+        companionData: v.any(),
+    },
+    handler: async (ctx, args) => {
+        const trip = await ctx.db.query("TripDetailTable")
+            .filter(q => q.and(
+                q.eq(q.field("uid"), args.uid),
+                q.eq(q.field("tripId"), args.tripId)
+            )).first();
+        if (trip) {
+            await ctx.db.patch(trip._id, {
+                companionData: args.companionData,
+            });
+            return { success: true };
+        }
+        return { success: false, error: "Trip not found" };
+    }
+});
+
 
         

@@ -1,7 +1,7 @@
 "use client"
 import { HeroVideoDialog } from '@/components/ui/hero-video-dialog'
 import { useUser } from '@clerk/nextjs'
-import { ChevronDown, Globe, MapPin, Mountain, Pencil, Send, Sparkles } from 'lucide-react'
+import { ChevronDown, Globe, Luggage, MapPin, Mountain, Pencil, Send, Sparkles } from 'lucide-react'
 import { motion } from "motion/react"
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -29,6 +29,14 @@ const Hero = () => {
       hoverBgColor: 'group-hover:bg-blue-200',
       badge: { type: 'text', content: '+', className: 'absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold' },
       href: '/create-new-trip',
+    },
+    {
+      label: 'My Trips',
+      icon: Luggage,
+      iconColor: 'text-purple-600',
+      bgColor: 'bg-purple-100',
+      hoverBgColor: 'group-hover:bg-purple-200',
+      href: '/my-trips',
     },
     {
       label: 'Inspire me where to Go',

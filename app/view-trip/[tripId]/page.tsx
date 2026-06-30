@@ -8,11 +8,11 @@ import PrintTravelGuide from '@/app/create-new-trip/_component/PrintTravelGuide'
 import { useTripDetail, useUserDetail } from '@/app/provider'
 import { api } from '@/convex/_generated/api'
 import { useConvex, useMutation } from 'convex/react'
-import { ArrowLeft, Check, CheckCircle, X, Star } from 'lucide-react'
+import { ArrowLeft, Check, CheckCircle, X, Star, Plane, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 import axios from 'axios'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 
 const ViewTrip = () => {
   const { tripId } = useParams();
@@ -20,10 +20,29 @@ const ViewTrip = () => {
   const { userDetail, setUserDetail } = useUserDetail();
   const convex = useConvex();
   const completeTrip = useMutation(api.tripDetail.completeTripDetail);
+  const saveCompanion = useMutation(api.tripDetail.SaveCompanionData);
 
   const { tripDetailInfo, setTripDetailInfo } = useTripDetail();
   const [activeDay, setActiveDay] = useState<number | null>(null);
   const [addonData, setAddonData] = useState<any>(null);
+
+  const googleFlightsUrl = useMemo(() => {
+    if (!tripDetailInfo?.origin || !tripDetailInfo?.destination) return "";
+    
+    const cleanCity = (name: string) => {
+      if (!name) return "";
+      return name.split(",")[0].trim();
+    };
+
+    const originCity = cleanCity(tripDetailInfo.origin);
+    const destCity = cleanCity(tripDetailInfo.destination);
+
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
+    const dateString = date.toISOString().split("T")[0];
+    const query = `Flights to ${destCity} from ${originCity} on ${dateString}`;
+    return `https://www.google.com/travel/flights?q=${encodeURIComponent(query)}`;
+  }, [tripDetailInfo?.origin, tripDetailInfo?.destination]);
 
   // Feedback Modal State
   const [showCompleteModal, setShowCompleteModal] = useState(false);
@@ -33,19 +52,31 @@ const ViewTrip = () => {
   const [feedbackNotes, setFeedbackNotes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tripDetailRecord, setTripDetailRecord] = useState<any | null>(null);
+  const [loadingAddon, setLoadingAddon] = useState(false);
 
   useEffect(() => {
-    userDetail && GetTripDetail();
-  }, [userDetail])
+    if (userDetail?._id) {
+      GetTripDetail();
+    }
+  }, [userDetail?._id]);
 
-  const fetchAddonData = async (origin: string, destination: string) => {
+  const fetchAddonData = async (origin: string, destination: string, currentTripId: string) => {
     try {
+      setLoadingAddon(true);
       const res = await axios.post("/api/trip-addon", { origin, destination });
       if (res.data && !res.data.error) {
         setAddonData(res.data);
+        // Save companion data to Convex to avoid future generation calls
+        await saveCompanion({
+          tripId: currentTripId,
+          uid: userDetail._id,
+          companionData: res.data
+        });
       }
     } catch (err) {
       console.error("Error fetching addon data in page", err);
+    } finally {
+      setLoadingAddon(false);
     }
   };
 
@@ -59,8 +90,13 @@ const ViewTrip = () => {
     setTripDetailInfo(tripDetail);
     setTripDetailRecord(result);
 
-    if (tripDetail?.origin && tripDetail?.destination) {
-      fetchAddonData(tripDetail.origin, tripDetail.destination);
+    // If we already have stored companion details in the database, fetch them instantly
+    if (result?.companionData) {
+      setAddonData(result.companionData);
+    } else if (tripDetail?.origin && tripDetail?.destination) {
+      if (!addonData && !loadingAddon) {
+        fetchAddonData(tripDetail.origin, tripDetail.destination, result.tripId || (tripId + ""));
+      }
     }
   }
 
@@ -132,6 +168,33 @@ const ViewTrip = () => {
                   </button>
                 )}
               </div>
+
+              {googleFlightsUrl && (
+                <a 
+                  href={googleFlightsUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between gap-3 p-3.5 mb-4 bg-gradient-to-r from-blue-50 to-indigo-50/50 dark:from-neutral-850 dark:to-neutral-800 border border-blue-100/60 dark:border-neutral-800 rounded-2xl cursor-pointer hover:shadow-sm hover:scale-[1.005] active:scale-[0.995] transition-all group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 bg-blue-500 text-white rounded-xl shadow-md shadow-blue-500/10 group-hover:animate-pulse">
+                      <Plane className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-black text-neutral-800 dark:text-neutral-200">
+                        Book Your Trip Flights
+                      </h4>
+                      <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium">
+                        Compare routes & schedule from {tripDetailInfo?.origin} to {tripDetailInfo?.destination}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-100/40 dark:bg-neutral-750 px-2.5 py-1 rounded-lg">
+                    <span>Search</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </div>
+                </a>
+              )}
 
               <GlobalMap trip={tripDetailInfo} activeDay={activeDay} />
               <div className="mt-6">
