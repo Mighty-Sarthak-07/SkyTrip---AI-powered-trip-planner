@@ -38,7 +38,7 @@ const FINAL_PROMPT = `You are a professional travel planner. Generate a highly a
      * 'Low' budget: Clean, budget-friendly options, hostels, guesthouses, and free/low-cost activities.
      * 'Medium' budget: Standard 3-star or 4-star hotels, moderate pricing, and popular standard attractions.
      * 'High' budget: Premium/luxury 5-star hotels, resorts, and premium curated activities.
-   - Specify "price_per_night" and "ticket_pricing" in realistic numbers, using INR for Indian destinations and USD/local currency for international destinations (e.g. "₹2,500/night" or "$150/night"). If entry to an attraction is free, state "Free entry".
+   - Specify "price_per_night" and "ticket_pricing" in realistic numbers, using INR for all destinations (e.g. "₹2,500"). If entry to an attraction is free, state "Free entry".
 5. **MakeMyTrip Hotel Booking**: Suggest hotels that are real, well-known, and bookable on MakeMyTrip. The hotel names and addresses must match how they appear on MakeMyTrip to allow successful searches.
 6. **Detailed Day Plans**: Provide a comprehensive description of the day's theme/plan under "day_plan", including practical travel/insider tips (e.g., best attire, local customs, peak hour warnings).
 
