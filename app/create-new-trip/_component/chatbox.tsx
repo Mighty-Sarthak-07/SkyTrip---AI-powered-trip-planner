@@ -132,7 +132,7 @@ const Chatbox = () => {
         }
     }, [isFinal])
     return (
-        <div className='h-[84vh] w-full shadow-2xl rounded-lg p-2 flex flex-col'>
+        <div className='h-[70vh] md:h-[84vh] w-full bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-xl md:shadow-2xl rounded-2xl md:rounded-lg p-2 md:p-3 flex flex-col'>
             {messages?.length == 0 && <EmptyBoxState onSelectOption={(v: string) => onSend(v)} />}
             <section className='flex-1 overflow-y-auto p-4'>
                 <div className="flex flex-col gap-2">

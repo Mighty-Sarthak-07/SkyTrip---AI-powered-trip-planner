@@ -24,6 +24,7 @@ import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from "motion/react";
 
 export interface LocationDetails {
   city: string;
@@ -801,8 +802,16 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
       )}
 
       {/* Tab Contents */}
-      {activeTab === "currency" ? (
-        <div className="space-y-4">
+      <AnimatePresence mode="wait">
+        {activeTab === "currency" ? (
+          <motion.div
+            key="currency"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="space-y-4"
+          >
           {/* Conversion Details */}
           <div className="flex items-center gap-3 bg-orange-50/40 dark:bg-neutral-850/40 p-3 rounded-2xl border border-orange-100/50 dark:border-neutral-800/30">
             <div className="text-xl font-bold">{origin.flag}</div>
@@ -906,10 +915,17 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
             </span>
             {ratesUpdated && <span>Updated {ratesUpdated}</span>}
           </div>
-        </div>
+        </motion.div>
       ) : activeTab === "timezone" ? (
         /* Timezone Tab */
-        <div className="space-y-4">
+        <motion.div
+          key="timezone"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="space-y-4"
+        >
           {/* Timezone Status Info */}
           <div className="bg-orange-50/40 dark:bg-neutral-850/40 p-3 rounded-2xl border border-orange-100/50 dark:border-neutral-800/30 flex items-start gap-2.5">
             <Globe className="w-4 h-4 text-orange-500 mt-0.5" />
@@ -989,10 +1005,17 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
               <span>✈️ Domestic Trip Details Locked</span>
             </div>
           )}
-        </div>
+        </motion.div>
       ) : (
         /* Events Tab */
-        <div className="space-y-4">
+        <motion.div
+          key="events"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="space-y-4"
+        >
           <div className="bg-orange-50/40 dark:bg-neutral-850/40 p-3 rounded-2xl border border-orange-100/50 dark:border-neutral-800/30 flex items-start gap-2.5">
             <Calendar className="w-4 h-4 text-orange-500 mt-0.5" />
             <div className="flex-1">
@@ -1071,8 +1094,9 @@ const TripPlannerAddon = ({ trip, initialData }: AddonProps) => {
               );
             })}
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* Dynamic AI travel recommendations */}
       <div className="mt-6 pt-5 border-t border-neutral-100 dark:border-neutral-800">
