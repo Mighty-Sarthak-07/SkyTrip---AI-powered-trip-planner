@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Facebook,
+  Github,
   Globe,
   Instagram,
   Linkedin,
@@ -24,7 +24,7 @@ export default function Footer() {
     ],
     support: [
       { name: "Help Center", href: "#" },
-      { name: "Contact Us", href: "#" },
+      { name: "Contact Us", href: "/contact" },
       { name: "Privacy Policy", href: "#" },
       { name: "Terms of Service", href: "#" },
     ],
@@ -37,10 +37,10 @@ export default function Footer() {
   };
 
   const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
+    { icon: Github, href: "https://github.com/Mighty-Sarthak-07", label: "GitHub" },
+    { icon: Twitter, href: "https://x.com/Lord_Sarthak01", label: "Twitter" },
+    { icon: Instagram, href: "https://www.instagram.com/savage_sarthak_07", label: "Instagram" },
+    { icon: Linkedin, href: "https://www.linkedin.com/in/sarthak-kesarwani-48b4702a7/", label: "LinkedIn" },
   ];
 
   return (

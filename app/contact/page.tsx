@@ -251,9 +251,9 @@ export default function ContactPage() {
                 <span className="text-sm font-semibold text-gray-700">Follow Sarthak:</span>
                 {[
                   { href: "https://github.com/Mighty-Sarthak-07", icon: Github, color: "hover:bg-gray-900 hover:text-white" },
-                  { href: "https://linkedin.com/in/sarthak-kesarwani", icon: Linkedin, color: "hover:bg-blue-600 hover:text-white" },
-                  { href: "https://twitter.com/SarthakKesarwani", icon: Twitter, color: "hover:bg-sky-500 hover:text-white" },
-                  { href: "https://instagram.com/sarthak.kesarwani", icon: Instagram, color: "hover:bg-pink-600 hover:text-white" },
+                  { href: "https://www.linkedin.com/in/sarthak-kesarwani-48b4702a7/", icon: Linkedin, color: "hover:bg-blue-600 hover:text-white" },
+                  { href: "https://x.com/Lord_Sarthak01", icon: Twitter, color: "hover:bg-sky-500 hover:text-white" },
+                  { href: "https://www.instagram.com/savage_sarthak_07", icon: Instagram, color: "hover:bg-pink-600 hover:text-white" },
                 ].map((social, i) => (
                   <a
                     key={i}
