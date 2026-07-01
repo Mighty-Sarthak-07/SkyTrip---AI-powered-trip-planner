@@ -131,9 +131,16 @@ export async function POST(req: NextRequest) {
   }
   catch (error: any) {
     console.error("Error in POST requestDetails:", error);
+    try {
+      const fs = require('fs');
+      const logContent = `${new Date().toISOString()} - ERROR: ${error.message}\nSTACK: ${error.stack}\nDETAILS: ${JSON.stringify(error)}\n\n`;
+      fs.appendFileSync('aimodel-error.log', logContent);
+    } catch (logErr) {
+      console.error("Failed to write log file:", logErr);
+    }
     return NextResponse.json({
       error: error.message || "Internal Server Error",
-      details: error.response?.data || "No additional details"
+      details: error.response?.data || error.error || "No additional details"
     }, { status: 500 });
   }
 }

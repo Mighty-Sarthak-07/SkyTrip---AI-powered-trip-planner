@@ -8,7 +8,9 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { messages, tripContext } = await req.json();
+        const body = await req.json();
+        const messages = body.messages || [];
+        const tripContext = body.tripContext || null;
 
         if (!tripContext) {
             return NextResponse.json({ error: "Trip context is required." }, { status: 400 });
@@ -56,14 +58,23 @@ Instructions:
 
         if (!reply) {
             console.error("Empty reply from Gemini API:", JSON.stringify(result.data));
-            return NextResponse.json({ error: "Invalid response from Gemini API" }, { status: 500 });
+            return NextResponse.json({ 
+                reply: "Sorry, I received an empty response from the Gemini API. Please try again." 
+            });
         }
 
         return NextResponse.json({ reply });
     }
     catch (error: any) {
-        const errorDetails = error?.response?.data || error.message;
-        console.error("Gemini Chat API Error:", JSON.stringify(errorDetails, null, 2));
-        return NextResponse.json({ error: "Failed to fetch response from Gemini", details: errorDetails }, { status: 500 });
+        const errorData = error?.response?.data || {};
+        const errorMessage = errorData.error?.message || error.message || "Unknown error";
+        const errorCode = errorData.error?.code || error?.response?.status || 500;
+        
+        console.error(`Gemini API error (Code: ${errorCode}):`, errorMessage);
+        
+        // Return a detailed, helpful error message directly in the chat reply so the user knows exactly why Gemini is failing
+        return NextResponse.json({ 
+            reply: `⚠️ **Gemini API Error (Status: ${errorCode})**: ${errorMessage}` 
+        });
     }
 }

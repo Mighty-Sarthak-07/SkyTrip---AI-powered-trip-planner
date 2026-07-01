@@ -21,7 +21,6 @@ const ActivityCard = ({ selectedActivity, setSelectedActivity }: ActivityCardPro
     const GetGooglePlaceDetail = async () => {
         try {
             const result = await axios.post('/api/google-place-detail', { placeName: selectedActivity?.place_name+":"+selectedActivity?.place_address });
-            console.log(result?.data);
             setPhotoUrl(result?.data);
         } catch (error: any) {
             console.error("Failed to fetch hotel details:", error);

@@ -16,7 +16,6 @@ import { useEffect, useState, useMemo } from 'react'
 
 const ViewTrip = () => {
   const { tripId } = useParams();
-  console.log(tripId);
   const { userDetail, setUserDetail } = useUserDetail();
   const convex = useConvex();
   const completeTrip = useMutation(api.tripDetail.completeTripDetail);
@@ -85,7 +84,6 @@ const ViewTrip = () => {
       tripId: tripId + "",
       uid: userDetail._id
     });
-    console.log(result);
     const tripDetail = result?.tripDetail;
     setTripDetailInfo(tripDetail);
     setTripDetailRecord(result);

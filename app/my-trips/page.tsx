@@ -26,7 +26,6 @@ const MyTripsPage = () => {
     const GetUserTrips = async () => {
         if (!userDetail) return;
         const result = await convex.query(api.tripDetail.getTripDetail, { uid: userDetail._id });
-        console.log(result);
         setMyTrips(result);
     }
 

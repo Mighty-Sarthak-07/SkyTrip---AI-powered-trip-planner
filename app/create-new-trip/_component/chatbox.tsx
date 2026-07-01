@@ -84,7 +84,6 @@ const Chatbox = () => {
             messages: [...messages, newMsg],
             isFinal: isFinal
         });
-        console.log("TRIP", result.data);
         !isFinal && setMessages((prev: Message[]) => [...prev, {
             role: 'assistant',
             content: result?.data?.resp,
@@ -115,7 +114,7 @@ const Chatbox = () => {
             return <Duration onSelectOption={(v: string) => (setUserInput(v))} />
         }
         else if (ui == 'final') {
-            return <FinalUI viewTripPlan={() => console.log()} disable={!tripDetail} />
+            return <FinalUI viewTripPlan={() => {}} disable={!tripDetail} />
         }
         return null;
     }
